@@ -1,0 +1,469 @@
+Here we go, cat bro 😺—here’s a **drop-in spec you can paste into Claude** to make it implement Nexus, including unit tests.
+
+I’ll write it as if I’m talking directly to Claude.
+
+---
+
+## 🧾 Prompt for Claude: Implement Nexus (rules, engine, tests)
+
+You are to implement an abstract board game called **Nexus**.
+
+The target is **idiomatic Python 3** with clear, testable code and unit tests (either `unittest` or `pytest` — your choice, but be consistent).
+
+### 0. High-level summary
+
+Nexus is a perfect-information, deterministic, two-player game played on an **n×n grid of intersections**, similar to Go.
+
+It combines:
+
+* **Go-style captures and liberties**
+* **Tic-Tac-Toe-style line completion (rows/cols/diagonals)**
+* **An economic “debt” layer**: capturing incurs debt that must be resolved when a line is completed
+* **Bankruptcy**: if you can’t pay your debt in stones, you lose
+
+You will implement:
+
+1. Core data structures
+2. Move legality (Go rules)
+3. Captures and debt tracking
+4. Line completion detection (rows/cols/2 main diagonals)
+5. Completion-time debt resolution (including bankruptcy)
+6. Rule 6: forced unblocking when no legal moves exist
+7. A simple public API for interacting with the game
+8. A comprehensive suite of unit tests
+
+---
+
+## 1. Game rules (for implementation)
+
+### 1.1 Board and players
+
+* Board: **n × n grid of points** (use 0-based indices: rows 0..n-1, cols 0..n-1).
+* Two players: `BLACK` and `WHITE`.
+* Stones are placed on intersections (points), not inside squares.
+
+Represent colors as an Enum or simple ints (`0` = empty, `1` = black, `2` = white) — your choice, but keep it clear.
+
+### 1.2 Groups, liberties, and captures (Go rules)
+
+* A **group** is a maximal connected set (4-connected: up, down, left, right) of stones of the same color.
+* A **liberty** is an empty point adjacent (4-connected) to a stone or group.
+
+When a stone is placed:
+
+1. Place the stone tentatively.
+2. Check all **adjacent opponent groups**:
+
+   * If any such group has **no liberties**, that group is captured: all stones in that group are removed.
+3. Then check the newly placed stone’s group:
+
+   * If it has no liberties *and* no opponent stones were captured by this move, the move is **illegal (suicide)** and must be rejected.
+   * If it has no liberties but the move captured something, it’s **legal** (like in Go).
+
+**Capturing and debt:**
+
+* Let `p1` be a positive integer parameter (e.g. `p1 = 1` initially).
+* Each enemy stone captured in this way adds **`p1` units of debt** to the capturing player’s debt counter.
+
+So if Black captures 3 White stones in a single move and `p1 = 1`, Black’s debt increases by 3.
+
+Maintain two integers:
+
+* `debt_black`
+* `debt_white`
+
+Always non-negative.
+
+### 1.3 Lines and Completion condition
+
+Define **lines** exactly like Tic-Tac-Toe, but on an n×n board:
+
+* Each **row** (fixed row index, all columns)
+* Each **column** (fixed column index, all rows)
+* The **two main diagonals** only:
+
+  * Top-left to bottom-right
+  * Top-right to bottom-left
+
+A line is **owned** by a player if **all n points** along that line are occupied by that player’s stones.
+
+A **Completion event** happens when, *after a player’s move has been fully applied (including captures)*, that player has **at least one full line**.
+
+Call that player **P** (the one who just moved and triggered Completion), and the other player **Q**.
+
+1.4 Debt resolution when Completion occurs
+
+When a Completion event occurs for player P (the one who just formed at least one full line), we perform a debt audit and resolution. This may result in an immediate win, an immediate bankruptcy loss for P, or the game continuing after P removes some of their own stones.
+
+Let:
+
+D_P = P’s current debt (debt_black or debt_white)
+
+D_Q = Q’s current debt (the other player)
+
+Compute net = D_P - D_Q
+
+Think of this as canceling both sides’ debt; only the difference matters.
+
+Case 1: net <= 0
+
+P’s debt is not greater than Q’s.
+
+All effective debt cancels.
+
+P wins immediately.
+
+The game is terminal, result = BLACK_WIN or WHITE_WIN.
+
+Case 2: net > 0
+
+P has more debt than Q and must “pay” the excess by removing their own stones.
+
+Let k = net.
+P is required to remove exactly k of P’s own stones from the board.
+
+If P has fewer than k stones on the board:
+
+P cannot pay the debt without wiping themselves out.
+
+P loses immediately by bankruptcy (opponent wins).
+
+If P has at least k stones:
+
+P chooses which k of their stones to remove.
+
+In rules terms: the player selects the stones that minimize damage to their position.
+
+In engine terms: you must support a way to specify these coordinates (e.g. as a parameter or a separate method). The rules do not require the engine to auto-pick “least damaging” stones; that’s a strategy/AI problem.
+
+Remove those k stones (just erase them — no new captures, no extra debt).
+
+After removal:
+
+Recompute whether P still has at least one full line.
+
+If yes, P wins immediately.
+
+If no, the game continues:
+
+Debts are now considered settled; reset both debts to zero:
+
+debt_black = 0, debt_white = 0
+
+The board stays as modified.
+
+Turn passes to Q (the other player).
+
+Important:
+
+Only P ever removes stones during Completion resolution.
+
+Q never removes stones as part of the Completion step.
+
+The “least damaging” choice is a strategic choice by the player/AI, not something the core rules engine must optimize.
+
+### 1.5 Rule 6: No legal move → Forced Unblocking
+
+On a player’s turn, before they can lay a stone normally, we must check if they have **any legal placement move** (using Go rules and ignoring Completion for the moment).
+
+* If they **do** have at least one legal placement: they must choose a legal placement as normal.
+* If they **have no legal placement move**:
+
+  * They must perform **Forced Unblocking**.
+
+#### Forced Unblocking (concept)
+
+* Let current player be P, opponent be Q.
+* P must remove the **minimum number** of Q’s stones needed such that *after* removing those stones, there exists at least **one legal placement** for P.
+
+In this implementation:
+
+* You don’t have to explore *all* subsets combinatorially.
+  A reasonable deterministic approach is fine, such as:
+
+  * Scan all single Q-stones: for each, simulate removing it and see if any legal move appears.
+
+    * If yes, choose the lexicographically smallest such stone as the set S (size 1).
+  * If none exist, scan all pairs of Q-stones, etc.
+  * For small boards and test purposes, you can search in increasing cardinality until you find a solution, and fail if none exist.
+* The key property: you must guarantee that the chosen set S is of **minimum size** (no smaller set could work).
+
+Let `k = |S|` = number of Q’s stones removed for unblocking.
+
+* Remove those `k` stones of Q.
+* For each stone removed in Forced Unblocking, P incurs **p₂** units of debt:
+
+  * `debt_P += k * p2`.
+* After removing them, now P proceeds to make a **normal move**:
+
+  * A regular placement, with Go legality, capture checks, and then possible Completion resolution.
+
+If **no such set S exists** (i.e., even removing all opponent stones wouldn’t allow any legal move):
+
+* P loses immediately (cannot move or unblock).
+
+### 1.6 End of game conditions
+
+The game ends when:
+
+* A player wins via Completion + debt resolution; or
+* A player loses by **bankruptcy** (cannot pay net debt or has to remove more stones than they have); or
+* A player loses because they have no legal move *and* Forced Unblocking is impossible.
+
+Once the game is terminal, further moves should raise an error or be rejected.
+
+### 1.7 Ko / repetition
+
+For this first implementation:
+**Do NOT implement superko or position repetition rules.**
+
+You may allow repeated positions; tests will not rely on ko-like edge cases.
+
+---
+
+## 2. Code design requirements
+
+Implement Nexus as a small, testable Python module.
+
+### 2.1 Suggested structure (you can adjust if you have a better one)
+
+* `nexus/`
+
+  * `__init__.py`
+  * `game.py`
+  * `types.py` (optional)
+  * `exceptions.py` (optional)
+  * `tests/`
+
+    * `test_basic_rules.py`
+    * `test_captures_and_debt.py`
+    * `test_completion_and_bankruptcy.py`
+    * `test_forced_unblocking.py`
+
+At minimum, one file for the engine and one test file is fine, but keep code tidy.
+
+### 2.2 Core classes / functions (minimum API)
+
+Implement something along these lines:
+
+```python
+class Player(Enum):
+    BLACK = 1
+    WHITE = 2
+
+class GameResult(Enum):
+    ONGOING = 0
+    BLACK_WIN = 1
+    WHITE_WIN = 2
+
+@dataclass
+class GameState:
+    board: List[List[int]]  # 0 = empty, 1 = black, 2 = white
+    size: int
+    to_move: Player
+    debt_black: int
+    debt_white: int
+    result: GameResult
+```
+
+Essential methods (on either `GameState` or a `NexusGame` class):
+
+1. `legal_moves(self) -> List[Tuple[int, int]]`
+
+   * Return list of (row, col) where a normal placement is legal for `to_move` (Go legality only; ignore Completion and Rule 6 here).
+
+2. `apply_move(self, row: int, col: int) -> None`
+
+   * Applies a **full move** for `to_move`:
+
+     * If there are any legal moves, `row, col` must be one of them (otherwise raise).
+     * Place stone, resolve captures, update debt for captures.
+     * Check for Completion; if triggered, perform debt resolution and possibly end game.
+     * If no Completion win/loss, pass turn to the other player.
+
+3. `step_with_forced_unblocking(self, row: int, col: int) -> None`
+
+   * High-level "do a turn":
+
+     * If there is at least one legal move, behave like `apply_move(row, col)`.
+     * If there are no legal moves:
+
+       * Run Forced Unblocking (Rule 6) as described.
+       * After removing opponent stones and adding `p2` debt, ensure that `(row, col)` is now a legal move; then place the stone and continue as normal (captures, Completion check, etc).
+       * If Forced Unblocking is impossible, mark loss for current player.
+
+   Alternatively: you can have a single `make_move(row, col)` that internally handles both cases.
+
+4. Helper methods (can be private):
+
+   * `_find_group(self, r, c) -> Set[Tuple[int,int]]`
+   * `_group_liberties(self, group) -> Set[Tuple[int,int]]`
+   * `_capture_groups_if_needed(...)`
+   * `_count_lines_for_player(player) -> int`
+   * `_has_full_line(player) -> bool`
+   * `_resolve_completion(player) -> None` (may update result, debts, and board)
+   * `_forced_unblock_if_needed() -> Optional[List[Tuple[int,int]]]`
+
+     * Returns list of removed stones, or raises if impossible.
+
+Make sure the API is **clean enough to be used by an AI later**.
+
+---
+
+## 3. Unit tests (MUST implement)
+
+Write clear unit tests that verify core behavior.
+
+### 3.1 Test: basic placement and Go legality
+
+* Creating a new `GameState` with size `n = 5`:
+
+  * Board should be empty.
+  * `to_move` should be `Player.BLACK`.
+  * `result` should be `ONGOING`.
+  * `debt_black` and `debt_white` both 0.
+
+* Placing a stone on an empty intersection should:
+
+  * Be legal.
+  * Not change debt.
+  * Not immediately end the game (no line yet).
+
+* Suicide move:
+
+  * Construct a small situation where placing a stone would create a group with no liberties and no captures (classic Go suicide position).
+  * Ensure that `apply_move` (or `make_move`) **rejects** this move (raise an exception or return an error).
+
+### 3.2 Test: simple capture and debt
+
+* On a 3×3 or 5×5 board, set up a position where:
+
+  * White has a single stone surrounded by Black in a way that Black’s next move will capture it.
+* After Black plays that move:
+
+  * The White stone should be removed.
+  * Black’s debt should increase by `p1` (assume `p1 = 1` in tests).
+  * No Completion happens yet and `result` remains `ONGOING`.
+
+### 3.3 Test: simple line completion with zero debt
+
+* On a small board (3×3):
+
+  1. Let `p1 = 1, p2 = 2`.
+  2. Play a sequence of moves where:
+
+     * Black fills an entire row (e.g., row 0) with no captures at all.
+  3. At the moment Black completes the row:
+
+     * Black’s debt = 0, White’s debt = 0.
+     * Completion should trigger.
+     * Since `net = 0`, Black should **win immediately**.
+     * `result` == `BLACK_WIN`.
+
+### 3.4 Test: completion with higher debt and enough stones to pay
+
+* Set up a position (maybe directly, skipping move sequence) where:
+
+  * It is Black’s turn.
+  * Board size 3×3 or 4×4.
+  * Black currently:
+
+    * Has **one full line** already, or will create it with the next move.
+    * Has debt `debt_black = 3`.
+  * White has `debt_white = 1`.
+
+* Let Black make the move that completes a line (if not already complete).
+
+Then on Completion:
+
+* `net = debt_black - debt_white = 2`.
+* Black must remove exactly 2 of their stones.
+* Ensure your implementation removes 2 Black stones deterministically.
+* After removal:
+
+  * Arrange the test so that the line is **broken** (no longer full).
+* Expected:
+
+  * No immediate win or loss from Completion.
+  * Both debts reset to 0.
+  * Game is still `ONGOING`.
+  * Next `to_move` is White.
+
+### 3.5 Test: bankruptcy on completion
+
+* Set up a position where:
+
+  * It’s Black’s turn.
+  * If Black plays at a certain point, they complete a full line.
+  * `debt_black` is significantly higher than `debt_white` so that:
+
+    * `net = debt_black - debt_white > number_of_black_stones_on_board`.
+
+* When Black makes that move:
+
+  * Completion triggers.
+  * Black must remove `net` of their stones, but they don’t have enough.
+  * Implementation should detect this and declare **Black loses by bankruptcy**.
+  * `result == WHITE_WIN`.
+
+### 3.6 Test: forced unblocking (Rule 6)
+
+Construct a small example where:
+
+* It’s Black’s turn.
+* Every empty intersection would be suicide for Black **if** placed directly (i.e., `legal_moves()` returns empty).
+* But there exists at least one White stone such that removing it would create at least one legal Black move.
+
+Test:
+
+* Call a high-level function (e.g., `make_move`) that knows to:
+
+  * Detect `no legal moves`.
+  * Run Forced Unblocking.
+  * Remove the minimal number of White stones (likely 1 in this test).
+  * Increase Black’s debt by `p2 * removed_count`.
+  * Then allow Black to place a stone on the specified point.
+* Assert:
+
+  * The White stone(s) were removed.
+  * Black’s debt increased appropriately.
+  * The subsequent Black move is legal.
+  * The game is still `ONGOING` unless this move also triggers Completion (if you want, you can make a test where it does).
+
+### 3.7 Test: illegal move when game already ended
+
+* After a win is recorded (via Completion or bankruptcy),
+
+  * Any attempt to call `make_move` / `apply_move` should raise an error or no-op with clear behavior.
+  * Test that this is enforced.
+
+---
+
+## 4. Implementation quality
+
+* Write **clear, documented** code.
+
+* Add docstrings to public methods explaining:
+
+  * What the method does.
+  * What rules it enforces.
+  * What exceptions it may raise.
+
+* Avoid premature micro-optimizations; correctness and clarity are more important.
+
+* Use pure Python and the standard library only.
+
+---
+
+## 5. Deliverables
+
+You should output:
+
+1. The full Python implementation of Nexus with all classes/functions described.
+2. A full set of unit tests that can be run via `pytest` or `python -m unittest`.
+3. (Optional but nice) A short README string at the top of the main file summarizing Nexus rules in a couple of paragraphs.
+
+---
+
+That’s it. Please now implement Nexus exactly as specified above, in Python, including all the unit tests.
+
