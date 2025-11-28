@@ -81,8 +81,8 @@ class GameState:
         debt_black: Black's current debt.
         debt_white: White's current debt.
         result: The current game result (ONGOING, BLACK_WIN, or WHITE_WIN).
-        p1: Debt per stone captured (default 1).
-        p2: Debt per stone removed during forced unblocking (default 2).
+        p1: Debt per stone captured (default 2).
+        p2: Debt per stone removed during forced unblocking (default 4).
     """
 
     size: int
@@ -91,8 +91,8 @@ class GameState:
     debt_black: int = 0
     debt_white: int = 0
     result: GameResult = GameResult.ONGOING
-    p1: int = 1
-    p2: int = 2
+    p1: int = 2
+    p2: int = 4
 
     def __post_init__(self):
         if not self.board:
