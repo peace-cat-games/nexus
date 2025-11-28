@@ -31,6 +31,8 @@ Play Nexus interactively in your terminal:
 ```bash
 # Start a game with default settings (5x5 board)
 nexus
+# Or run as a Python module
+python -m nexus
 
 # Custom board size
 nexus --size 7
@@ -163,6 +165,3 @@ nexus/
 └── README.md
 ```
 
-## License
-
-MIT
