@@ -138,14 +138,14 @@ class NexusGame:
     line completion, debt resolution, and forced unblocking.
     """
 
-    def __init__(self, size: int = 5, p1: int = 1, p2: int = 2):
+    def __init__(self, size: int = 5, p1: int = 2, p2: int = 4):
         """
         Initialize a new Nexus game.
 
         Args:
             size: Board dimension (default 5 for a 5×5 board).
-            p1: Debt per stone captured (default 1).
-            p2: Debt per stone removed during forced unblocking (default 2).
+            p1: Debt per stone captured (default 2).
+            p2: Debt per stone removed during forced unblocking (default 4).
         """
         self.state = GameState(size=size, p1=p1, p2=p2)
 
