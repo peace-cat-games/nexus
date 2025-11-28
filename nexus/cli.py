@@ -266,6 +266,7 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
 
             if unblocked:
                 print(f"Forced unblocking removed: {unblocked}")
+                print_board(game)
 
             if game.result != GameResult.ONGOING:
                 print_board(game)

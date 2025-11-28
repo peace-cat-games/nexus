@@ -24,6 +24,30 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+### Command-Line Interface
+
+Play Nexus interactively in your terminal:
+
+```bash
+# Start a game with default settings (5x5 board)
+nexus
+
+# Custom board size
+nexus --size 7
+
+# Custom debt parameters
+nexus --size 5 --p1 3 --p2 5
+```
+
+In-game commands:
+- `r,c` or `r c` - Place a stone at row r, column c (e.g., `2,3`)
+- `legal` - Show all legal moves
+- `rules` - Show game rules
+- `help` - Show help
+- `quit` - Exit the game
+
+### Python API
+
 ```python
 from nexus import NexusGame, Player
 
@@ -128,6 +152,8 @@ black .
 nexus/
 ├── nexus/
 │   ├── __init__.py       # Package exports
+│   ├── __main__.py       # Module entry point
+│   ├── cli.py            # Command-line interface
 │   ├── game.py           # Core game engine
 │   ├── exceptions.py     # Custom exceptions
 │   └── tests/            # Unit tests
