@@ -172,25 +172,16 @@ After removal:
 
 ---
 
-# **8. Ko & Repetition**
+# **8. Ko Rule**
 
-### **8.1 Nexus has no Ko rule by default.**
+Nexus uses a **positional superko** rule to prevent infinite repetition:
 
-Position repetition **is allowed**.
-This is intentional:
+* A player may not make a move that recreates *any previous (board, debt_difference) state*.
+* Here, `debt_difference = debt_black - debt_white`.
 
-* Nexus already has strong debt-based anti-cycling pressure.
-* The debt economy ensures that “infinite Go fights” eventually become fatal.
-* Forced Unblocking ensures boards cannot enter certain Go-style “two-eyes-only” deadlocks.
+A move is illegal if the resulting board and debt difference exactly match any previously seen state.
 
-### **8.2 Optional Superko (advanced variant)**
-
-If desired, an optional rule can be adopted:
-
-* **Positional superko:** A player may not recreate *any previous board+turn+debt state.*
-
-This is optional and not part of the base rules.
-For AI and human play, **default = no superko**.
+This prevents infinite cycles that could otherwise occur through repeated captures.
 
 ---
 

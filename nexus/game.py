@@ -27,6 +27,7 @@ from .exceptions import (
     SuicideError,
     OccupiedPointError,
     ForcedUnblockingImpossibleError,
+    KoError,
 )
 
 
@@ -83,6 +84,7 @@ class GameState:
         result: The current game result (ONGOING, BLACK_WIN, or WHITE_WIN).
         p1: Debt per stone captured (default 2).
         p2: Debt per stone removed during forced unblocking (default 4).
+        position_history: Set of previous (board_tuple, debt_difference) states for ko detection.
     """
 
     size: int
@@ -93,6 +95,7 @@ class GameState:
     result: GameResult = GameResult.ONGOING
     p1: int = 2
     p2: int = 4
+    position_history: Set[Tuple] = field(default_factory=set)
 
     def __post_init__(self):
         if not self.board:
@@ -109,7 +112,14 @@ class GameState:
             result=self.result,
             p1=self.p1,
             p2=self.p2,
+            position_history=self.position_history.copy(),
         )
+
+    def get_position_key(self) -> Tuple:
+        """Get a hashable key for the current position (board, debt_difference)."""
+        board_tuple = tuple(tuple(row) for row in self.board)
+        debt_diff = self.debt_black - self.debt_white
+        return (board_tuple, debt_diff)
 
     def get_debt(self, player: Player) -> int:
         """Get the current debt for a player."""
@@ -313,6 +323,61 @@ class NexusGame:
         self.board[r][c] = original
         return would_capture
 
+    def _would_violate_ko(self, r: int, c: int, player: Player, new_debt: int) -> bool:
+        """
+        Check if placing a stone would violate the ko (superko) rule.
+
+        Simulates the move (including captures) and checks if the resulting
+        position + debt difference has been seen before.
+
+        Args:
+            r: Row to place the stone.
+            c: Column to place the stone.
+            player: The player making the move.
+            new_debt: The debt that would be added by this move (from captures).
+
+        Returns:
+            True if the move would violate the ko rule.
+        """
+        # Save current state
+        original_board = [row[:] for row in self.board]
+        original_debt_black = self.state.debt_black
+        original_debt_white = self.state.debt_white
+
+        # Simulate placing the stone
+        self.board[r][c] = player_to_stone(player)
+
+        # Simulate captures
+        opponent_stone = player_to_stone(player.opponent())
+        for nr, nc in self._neighbors(r, c):
+            if self.board[nr][nc] == opponent_stone:
+                group = self._find_group(nr, nc)
+                liberties = self._group_liberties(group)
+                if len(liberties) == 0:
+                    for gr, gc in group:
+                        self.board[gr][gc] = EMPTY
+
+        # Compute the resulting debt difference
+        if player == Player.BLACK:
+            new_debt_black = original_debt_black + new_debt
+            new_debt_white = original_debt_white
+        else:
+            new_debt_black = original_debt_black
+            new_debt_white = original_debt_white + new_debt
+
+        # Check if this position + debt diff has been seen
+        board_tuple = tuple(tuple(row) for row in self.board)
+        debt_diff = new_debt_black - new_debt_white
+        position_key = (board_tuple, debt_diff)
+        violates = position_key in self.state.position_history
+
+        # Restore original state
+        self.state.board = original_board
+        self.state.debt_black = original_debt_black
+        self.state.debt_white = original_debt_white
+
+        return violates
+
     def _is_legal_move(self, r: int, c: int, player: Optional[Player] = None) -> bool:
         """
         Check if a move at (r, c) is legal for the given player.
@@ -320,6 +385,7 @@ class NexusGame:
         A move is legal if:
         1. The point is empty.
         2. The move is not suicide (unless it captures opponent stones).
+        3. The move does not violate the ko rule (if enabled).
 
         Args:
             r: Row to place the stone.
@@ -348,7 +414,48 @@ class NexusGame:
         if is_suicide and not would_capture:
             return False
 
+        # Check ko rule
+        captured_count = self._count_captures(r, c, player)
+        new_debt = captured_count * self.state.p1
+        if self._would_violate_ko(r, c, player, new_debt):
+            return False
+
         return True
+
+    def _count_captures(self, r: int, c: int, player: Player) -> int:
+        """
+        Count how many opponent stones would be captured by placing at (r, c).
+
+        Args:
+            r: Row to place the stone.
+            c: Column to place the stone.
+            player: The player making the move.
+
+        Returns:
+            Number of opponent stones that would be captured.
+        """
+        # Temporarily place the stone
+        original = self.board[r][c]
+        self.board[r][c] = player_to_stone(player)
+
+        opponent_stone = player_to_stone(player.opponent())
+        captured_count = 0
+        captured_positions = set()
+
+        for nr, nc in self._neighbors(r, c):
+            if (
+                self.board[nr][nc] == opponent_stone
+                and (nr, nc) not in captured_positions
+            ):
+                group = self._find_group(nr, nc)
+                liberties = self._group_liberties(group)
+                if len(liberties) == 0:
+                    captured_positions.update(group)
+                    captured_count += len(group)
+
+        # Restore
+        self.board[r][c] = original
+        return captured_count
 
     def legal_moves(self) -> List[Tuple[int, int]]:
         """
@@ -501,6 +608,10 @@ class NexusGame:
         # Game continues: reset debts, pass turn
         self.state.debt_black = 0
         self.state.debt_white = 0
+
+        # Record position for ko detection - after debt reset
+        self.state.position_history.add(self.state.get_position_key())
+
         self.state.to_move = player.opponent()
         return False
 
@@ -535,6 +646,13 @@ class NexusGame:
         if not self._is_legal_move(row, col, player):
             if self.board[row][col] != EMPTY:
                 raise OccupiedPointError(f"Point ({row}, {col}) is already occupied")
+            # Check if it's a ko violation
+            captured_count = self._count_captures(row, col, player)
+            new_debt = captured_count * self.state.p1
+            if self._would_violate_ko(row, col, player, new_debt):
+                raise KoError(
+                    f"Move at ({row}, {col}) would repeat a previous position"
+                )
             raise SuicideError(f"Move at ({row}, {col}) would be suicide")
 
         # Place the stone
@@ -552,6 +670,9 @@ class NexusGame:
             game_ended = self._resolve_completion(player, stones_to_remove)
             if game_ended:
                 return
+
+        # Record position for ko detection
+        self.state.position_history.add(self.state.get_position_key())
 
         # Pass turn
         self.state.to_move = player.opponent()

@@ -35,3 +35,9 @@ class ForcedUnblockingImpossibleError(NexusError):
     """Raised when no set of opponent stones can be removed to create a legal move."""
 
     pass
+
+
+class KoError(IllegalMoveError):
+    """Raised when a move would violate the ko (superko) rule by repeating a previous position."""
+
+    pass

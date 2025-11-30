@@ -85,11 +85,15 @@ Debt Resolution:
   - If the line is broken: Game continues, debts reset to 0
   - If line remains complete: You WIN
 
-Forced Unblocking (Rule 6):
+Forced Unblocking:
 • If you have no legal moves, you MUST remove opponent stones
 • Removes minimum stones needed to create a legal move
 • Adds debt: removed_stones × p2 (default: 4)
 • If unblocking is impossible: You LOSE
+
+Ko Rule:
+• Prevents repeating any previous (board, debt_difference) state
+• A move is illegal if it would recreate a past position with the same debt difference
 """
     )
 
