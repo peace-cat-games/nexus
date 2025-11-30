@@ -111,3 +111,75 @@
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* Debt Resolution Panel */
+.debt-resolution-panel {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid rgba(255, 193, 7, 0.5);
+}
+
+.debt-resolution-panel h3 {
+  margin: 0 0 10px 0;
+  color: #ffc107;
+  font-size: 1.2rem;
+}
+
+.debt-resolution-info {
+  margin: 8px 0;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.debt-resolution-progress {
+  margin: 8px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffc107;
+}
+
+.debt-resolution-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.debt-resolution-buttons button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.debt-resolution-buttons button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.confirm-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.confirm-btn:disabled {
+  background-color: rgba(76, 175, 80, 0.4);
+  cursor: not-allowed;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.cancel-btn {
+  background-color: #666;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #555;
+}

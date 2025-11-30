@@ -114,3 +114,39 @@
   color: var(--text-color);
   opacity: 0.7;
 }
+
+/* Debt resolution mode styles */
+.cell.pending-move {
+  background-color: rgba(76, 175, 80, 0.3);
+}
+
+.pending-stone {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  border: 3px dashed #4caf50;
+  background: transparent;
+  position: absolute;
+}
+
+.cell.selectable-for-debt {
+  cursor: pointer;
+}
+
+.cell.selectable-for-debt .stone {
+  box-shadow: 0 0 8px 2px rgba(255, 193, 7, 0.6);
+}
+
+.cell.selected-for-debt .stone {
+  box-shadow: 0 0 12px 4px rgba(233, 69, 96, 0.8);
+}
+
+.cell.selected-for-debt::before {
+  content: 'X';
+  position: absolute;
+  font-size: 24px;
+  font-weight: bold;
+  color: #e94560;
+  z-index: 10;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}

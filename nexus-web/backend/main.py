@@ -21,6 +21,7 @@ from nexus.exceptions import (
     SuicideError,
     OccupiedPointError,
     ForcedUnblockingImpossibleError,
+    KoError,
 )
 
 
@@ -138,6 +139,8 @@ def make_move(game_id: str, request: MoveRequest) -> MoveResponse:
         raise HTTPException(status_code=400, detail=str(e))
     except SuicideError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except KoError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except IllegalMoveError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except ForcedUnblockingImpossibleError as e:
@@ -174,6 +177,50 @@ def get_debt_resolution_info(game_id: str) -> Dict[str, Any]:
         "stones_to_remove": max(0, net),
         "player_stones": [[r, c] for r, c in player_stones],
         "can_pay": len(player_stones) >= max(0, net),
+    }
+
+
+class CheckMoveRequest(BaseModel):
+    row: int = Field(ge=0, description="Row coordinate")
+    col: int = Field(ge=0, description="Column coordinate")
+
+
+@app.post("/api/games/{game_id}/check-move")
+def check_move(game_id: str, request: CheckMoveRequest) -> Dict[str, Any]:
+    """
+    Check if a move would trigger debt resolution and calculate requirements.
+    This allows the frontend to prompt for stone selection before making the move.
+    """
+    if game_id not in games:
+        raise HTTPException(status_code=404, detail="Game not found")
+
+    game = games[game_id]
+
+    # Use the game's check method
+    stones_needed = game.check_completion_debt_resolution(request.row, request.col)
+
+    if stones_needed is None:
+        return {
+            "requires_debt_resolution": False,
+            "stones_to_remove": 0,
+            "player_stones": [],
+            "would_be_bankrupt": False,
+        }
+
+    player = game.to_move
+    player_stones = game._get_player_stones(player)
+
+    # Check if move would cause bankruptcy
+    # Note: player gets one more stone from the move itself, but that stone is placed,
+    # so we check against current stones (the placed stone cannot be removed as it
+    # completes the line)
+    would_be_bankrupt = len(player_stones) < stones_needed
+
+    return {
+        "requires_debt_resolution": True,
+        "stones_to_remove": stones_needed,
+        "player_stones": [[r, c] for r, c in player_stones],
+        "would_be_bankrupt": would_be_bankrupt,
     }
 
 

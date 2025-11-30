@@ -1,12 +1,15 @@
-import { GameState } from '../types';
+import { GameState, DebtResolutionState } from '../types';
 import './GameInfo.css';
 
 interface GameInfoProps {
   gameState: GameState | null;
   error: string | null;
+  debtResolution?: DebtResolutionState | null;
+  onConfirmDebtResolution?: () => void;
+  onCancelDebtResolution?: () => void;
 }
 
-export function GameInfo({ gameState, error }: GameInfoProps) {
+export function GameInfo({ gameState, error, debtResolution, onConfirmDebtResolution, onCancelDebtResolution }: GameInfoProps) {
   if (!gameState) {
     return (
       <div className="game-info">
@@ -28,6 +31,28 @@ export function GameInfo({ gameState, error }: GameInfoProps) {
           <h2>
             {gameState.result === 'BLACK_WIN' ? 'Black (X) Wins!' : 'White (O) Wins!'}
           </h2>
+        </div>
+      ) : debtResolution ? (
+        <div className="debt-resolution-panel">
+          <h3>Debt Resolution</h3>
+          <p className="debt-resolution-info">
+            Select {debtResolution.stonesToRemove} stone{debtResolution.stonesToRemove > 1 ? 's' : ''} to remove
+          </p>
+          <p className="debt-resolution-progress">
+            Selected: {debtResolution.selectedStones.length} / {debtResolution.stonesToRemove}
+          </p>
+          <div className="debt-resolution-buttons">
+            <button
+              className="confirm-btn"
+              onClick={onConfirmDebtResolution}
+              disabled={debtResolution.selectedStones.length !== debtResolution.stonesToRemove}
+            >
+              Confirm
+            </button>
+            <button className="cancel-btn" onClick={onCancelDebtResolution}>
+              Cancel
+            </button>
+          </div>
         </div>
       ) : (
         <div className="turn-indicator">
@@ -57,7 +82,7 @@ export function GameInfo({ gameState, error }: GameInfoProps) {
         <span>Board: {gameState.size}x{gameState.size}</span>
       </div>
 
-      {!isGameOver && gameState.legal_moves.length === 0 && (
+      {!isGameOver && !debtResolution && gameState.legal_moves.length === 0 && (
         <div className="warning-message">
           No legal moves! Forced unblocking required.
         </div>

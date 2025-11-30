@@ -1,4 +1,4 @@
-import { GameState, MoveResponse, NewGameOptions } from '../types';
+import { GameState, MoveResponse, NewGameOptions, CheckMoveResponse } from '../types';
 
 const API_BASE = '/api';
 
@@ -51,4 +51,21 @@ export async function deleteGame(gameId: string): Promise<void> {
   if (!response.ok) {
     throw new Error(`Failed to delete game: ${response.statusText}`);
   }
+}
+
+export async function checkMove(
+  gameId: string,
+  row: number,
+  col: number
+): Promise<CheckMoveResponse> {
+  const response = await fetch(`${API_BASE}/games/${gameId}/check-move`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ row, col }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to check move');
+  }
+  return response.json();
 }

@@ -24,6 +24,21 @@ export interface NewGameOptions {
   p2: number;
 }
 
+export interface CheckMoveResponse {
+  requires_debt_resolution: boolean;
+  stones_to_remove: number;
+  player_stones: [number, number][];
+  would_be_bankrupt: boolean;
+}
+
+export interface DebtResolutionState {
+  pendingMove: [number, number];
+  stonesToRemove: number;
+  playerStones: [number, number][];
+  selectedStones: [number, number][];
+  wouldBeBankrupt: boolean;
+}
+
 export const EMPTY = 0;
 export const BLACK = 1;
 export const WHITE = 2;
