@@ -210,16 +210,16 @@ def check_move(game_id: str, request: CheckMoveRequest) -> Dict[str, Any]:
     player = game.to_move
     player_stones = game._get_player_stones(player)
 
-    # Check if move would cause bankruptcy
-    # Note: player gets one more stone from the move itself, but that stone is placed,
-    # so we check against current stones (the placed stone cannot be removed as it
-    # completes the line)
-    would_be_bankrupt = len(player_stones) < stones_needed
+    # Include the stone being placed - it can also be removed during debt resolution
+    player_stones_with_new = player_stones + [(request.row, request.col)]
+
+    # Check if move would cause bankruptcy (including the new stone)
+    would_be_bankrupt = len(player_stones_with_new) < stones_needed
 
     return {
         "requires_debt_resolution": True,
         "stones_to_remove": stones_needed,
-        "player_stones": [[r, c] for r, c in player_stones],
+        "player_stones": [[r, c] for r, c in player_stones_with_new],
         "would_be_bankrupt": would_be_bankrupt,
     }
 

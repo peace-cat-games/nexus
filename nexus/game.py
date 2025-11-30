@@ -371,8 +371,10 @@ class NexusGame:
         position_key = (board_tuple, debt_diff)
         violates = position_key in self.state.position_history
 
-        # Restore original state
-        self.state.board = original_board
+        # Restore original state (in-place to preserve references)
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                self.board[i][j] = original_board[i][j]
         self.state.debt_black = original_debt_black
         self.state.debt_white = original_debt_white
 
