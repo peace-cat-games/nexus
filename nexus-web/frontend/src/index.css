@@ -1,0 +1,29 @@
+:root {
+  --bg-color: #1a1a2e;
+  --board-color: #16213e;
+  --grid-color: #0f3460;
+  --accent-color: #e94560;
+  --text-color: #eaeaea;
+  --black-stone: #1a1a1a;
+  --white-stone: #f0f0f0;
+  --highlight-color: rgba(233, 69, 96, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

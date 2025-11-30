@@ -1,0 +1,127 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(15, 52, 96, 0.8), transparent);
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent-color), #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-header p {
+  opacity: 0.7;
+  font-size: 1rem;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar.left {
+  order: 1;
+}
+
+.game-area {
+  order: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar.right {
+  order: 3;
+}
+
+.empty-board-placeholder {
+  width: min(500px, 80vw);
+  height: min(500px, 80vw);
+  background-color: var(--board-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.empty-board-placeholder p {
+  font-size: 1.2rem;
+  opacity: 0.5;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--grid-color);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive layout */
+@media (max-width: 1200px) {
+  .app-main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar.left,
+  .sidebar.right {
+    order: unset;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .sidebar.left {
+    order: 1;
+  }
+
+  .game-area {
+    order: 2;
+  }
+
+  .sidebar.right {
+    order: 3;
+  }
+}

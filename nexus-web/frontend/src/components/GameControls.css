@@ -1,0 +1,113 @@
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background-color: var(--board-color);
+  border-radius: 8px;
+  min-width: 250px;
+}
+
+.new-game-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--accent-color), #ff6b6b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.new-game-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.new-game-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.options-toggle {
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--grid-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.options-toggle:hover {
+  background-color: var(--grid-color);
+}
+
+.options-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.option label {
+  font-size: 14px;
+}
+
+.option input {
+  width: 60px;
+  padding: 6px;
+  font-size: 14px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--grid-color);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.option input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.rules-summary {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rules-summary h4 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.rules-summary ul {
+  list-style: none;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.rules-summary li {
+  margin-bottom: 6px;
+  padding-left: 12px;
+  position: relative;
+}
+
+.rules-summary li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--accent-color);
+}

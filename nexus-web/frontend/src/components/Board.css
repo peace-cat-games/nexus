@@ -1,0 +1,116 @@
+.board-container {
+  position: relative;
+  display: inline-block;
+  padding: 30px;
+}
+
+.board {
+  display: grid;
+  gap: 0;
+  background-color: var(--board-color);
+  border-radius: 8px;
+  padding: 10px;
+  position: relative;
+  width: min(500px, 80vw);
+  height: min(500px, 80vw);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.grid-lines {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  pointer-events: none;
+}
+
+.cell {
+  position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+  z-index: 1;
+}
+
+.cell:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.cell.legal {
+  cursor: pointer;
+}
+
+.cell.legal::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background-color: var(--highlight-color);
+}
+
+.cell.last-move {
+  background-color: rgba(233, 69, 96, 0.15);
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.stone {
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.black-stone {
+  background: radial-gradient(circle at 30% 30%, #4a4a4a, var(--black-stone));
+}
+
+.white-stone {
+  background: radial-gradient(circle at 30% 30%, #ffffff, var(--white-stone));
+}
+
+.cell:hover .stone {
+  transform: scale(1.05);
+}
+
+.row-labels {
+  position: absolute;
+  left: 5px;
+  top: 40px;
+  height: calc(100% - 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.row-labels span {
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.col-labels {
+  position: absolute;
+  top: calc(100% - 25px);
+  left: 40px;
+  width: calc(100% - 60px);
+  display: flex;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.col-labels span {
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.7;
+}
