@@ -780,6 +780,61 @@ class NexusGame:
         self.apply_move(row, col, stones_to_remove)
         return unblocked_stones
 
+    def check_completion_debt_resolution(self, row: int, col: int) -> Optional[int]:
+        """
+        Check if a move will trigger completion with positive net debt.
+
+        Simulates the move (including forced unblocking and captures) to determine
+        if debt resolution will be needed and how many stones must be removed.
+
+        Args:
+            row: Row to place the stone.
+            col: Column to place the stone.
+
+        Returns:
+            Number of stones to remove if net debt > 0, or None if no debt
+            resolution is needed (either no completion or net debt <= 0).
+        """
+        # Create a copy of the game state
+        test_game = NexusGame(size=self.size, p1=self.state.p1, p2=self.state.p2)
+        test_game.state = self.state.copy()
+
+        player = test_game.state.to_move
+
+        # Simulate forced unblocking if needed
+        legal = test_game.legal_moves()
+        if not legal:
+            unblock_set = test_game._find_minimal_unblocking_set()
+            if unblock_set is None:
+                return None  # Game would end due to unblocking failure
+            for r, c in unblock_set:
+                test_game.board[r][c] = EMPTY
+            test_game.state.add_debt(player, len(unblock_set) * test_game.state.p2)
+
+        # Check if the move is legal
+        if not test_game._is_legal_move(row, col, player):
+            return None  # Illegal move
+
+        # Simulate placing the stone and captures
+        test_game.board[row][col] = player_to_stone(player)
+        captured = test_game._capture_groups_if_needed(player, (row, col))
+        if captured > 0:
+            test_game.state.add_debt(player, captured * test_game.state.p1)
+
+        # Check if completion occurs
+        if not test_game._has_full_line(player):
+            return None  # No completion
+
+        # Calculate net debt
+        debt_p = test_game.state.get_debt(player)
+        debt_q = test_game.state.get_debt(player.opponent())
+        net = debt_p - debt_q
+
+        if net <= 0:
+            return None  # Instant win, no removal needed
+
+        return net  # Return number of stones to remove
+
     def set_position(
         self,
         board: List[List[int]],

@@ -430,3 +430,114 @@ class TestCompletionWithCapture:
         # Row 0 is still complete (0,0), (0,1), (0,2)
         # Removing from elsewhere keeps the line
         assert game.result == GameResult.BLACK_WIN
+
+
+class TestCheckCompletionDebtResolution:
+    """Tests for check_completion_debt_resolution method."""
+
+    def test_no_completion_returns_none(self):
+        """Returns None if move doesn't complete a line."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, EMPTY, EMPTY],
+                [WHITE, EMPTY, EMPTY],
+                [EMPTY, EMPTY, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        result = game.check_completion_debt_resolution(0, 1)
+        assert result is None
+
+    def test_completion_with_no_debt_returns_none(self):
+        """Returns None if completion with net debt <= 0."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, BLACK, EMPTY],
+                [WHITE, WHITE, EMPTY],
+                [EMPTY, EMPTY, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        result = game.check_completion_debt_resolution(0, 2)
+        assert result is None  # No debt, instant win
+
+    def test_completion_with_positive_net_debt(self):
+        """Returns stone count when net debt > 0."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, BLACK, EMPTY],
+                [BLACK, WHITE, EMPTY],
+                [BLACK, WHITE, EMPTY],
+            ],
+            to_move=Player.BLACK,
+            debt_black=4,
+            debt_white=1,
+        )
+
+        # Net debt = 4 - 1 = 3
+        result = game.check_completion_debt_resolution(0, 2)
+        assert result == 3
+
+    def test_completion_with_capture_adds_debt(self):
+        """Accounts for capture debt when checking."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, BLACK, EMPTY],
+                [EMPTY, BLACK, WHITE],
+                [EMPTY, BLACK, BLACK],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        # Move at (0,2) captures White at (1,2) (surrounded by Black) -> adds 2 debt
+        # Completes row 0 with net = 2 - 0 = 2
+        result = game.check_completion_debt_resolution(0, 2)
+        assert result == 2
+
+    def test_illegal_move_returns_none(self):
+        """Returns None for illegal moves."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, EMPTY, EMPTY],
+                [EMPTY, EMPTY, EMPTY],
+                [EMPTY, EMPTY, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        # Position (0,0) is already occupied
+        result = game.check_completion_debt_resolution(0, 0)
+        assert result is None
+
+    def test_does_not_modify_game_state(self):
+        """Check doesn't modify the actual game state."""
+        game = NexusGame(size=3, p1=2, p2=4)
+        game.set_position(
+            [
+                [BLACK, BLACK, EMPTY],
+                [BLACK, WHITE, EMPTY],
+                [BLACK, WHITE, EMPTY],
+            ],
+            to_move=Player.BLACK,
+            debt_black=4,
+            debt_white=1,
+        )
+
+        original_board = [row[:] for row in game.board]
+        original_debt_black = game.state.debt_black
+        original_debt_white = game.state.debt_white
+
+        game.check_completion_debt_resolution(0, 2)
+
+        # State should be unchanged
+        assert game.board == original_board
+        assert game.state.debt_black == original_debt_black
+        assert game.state.debt_white == original_debt_white
+        assert game.result == GameResult.ONGOING

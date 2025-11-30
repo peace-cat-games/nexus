@@ -204,9 +204,6 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
         if not legal:
             print("No legal moves available!")
             unblock_set = game._find_minimal_unblocking_set()
-            if unblock_set is None:
-                print(f"{game.to_move.name} cannot unblock and loses!")
-                break
             print(f"Forced unblocking will remove: {unblock_set}")
             print(f"This will add {len(unblock_set) * p2} debt.")
 
@@ -257,14 +254,28 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
 
         # Try to make the move
         try:
-            # Check if this move will complete a line and require debt resolution
-            # We need to peek ahead to see if stones_to_remove is needed
+            # Check if this move will trigger completion with positive net debt
             stones_to_remove = None
+            required = game.check_completion_debt_resolution(row, col)
 
-            # Make a copy to check
-            from copy import deepcopy
-
-            test_state = game.state.copy()
+            if required is not None and required > 0:
+                # Count player's stones to check for bankruptcy
+                # Add 1 because the move will place another stone
+                player_stone_count = game._count_stones(game.to_move) + 1
+                if player_stone_count < required:
+                    # Player doesn't have enough stones - bankruptcy, loses immediately
+                    print(
+                        f"\nThis move completes a line but you have net debt of {required}."
+                    )
+                    print(
+                        f"You only have {player_stone_count} stones - BANKRUPTCY! You lose."
+                    )
+                else:
+                    # Player must manually select stones to remove
+                    print(
+                        f"\nThis move completes a line but you have net debt of {required}."
+                    )
+                    stones_to_remove = get_stones_to_remove(game, required)
 
             unblocked = game.make_move(row, col, stones_to_remove)
 
