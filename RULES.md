@@ -1,13 +1,3 @@
-Prrrr—got it, cat bro.
-Here is a **cleanly updated RULES.md**, now with:
-
-* **Default p₁ = 2**
-* **Default p₂ = 4**
-* A full **clarification of ko / repetition**
-* All earlier text fully integrated (no patching needed)
-
-And afterwards I’ll add **2 new puzzles** that specifically illustrate p₁=2 / p₂=4 impact.
-
 ---
 
 # 🐾 **RULES.md — NEXUS**
