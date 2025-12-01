@@ -1,4 +1,4 @@
-import { CellValue, BLACK, WHITE, EMPTY, DebtResolutionState } from '../types';
+import { CellValue, BLACK, WHITE, EMPTY, DebtResolutionState, UnblockingState } from '../types';
 import './Board.css';
 
 interface BoardProps {
@@ -9,9 +9,10 @@ interface BoardProps {
   disabled: boolean;
   lastMove?: [number, number] | null;
   debtResolution?: DebtResolutionState | null;
+  unblocking?: UnblockingState | null;
 }
 
-export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove, debtResolution }: BoardProps) {
+export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove, debtResolution, unblocking }: BoardProps) {
   const isLegalMove = (row: number, col: number): boolean => {
     return legalMoves.some(([r, c]) => r === row && c === col);
   };
@@ -36,6 +37,12 @@ export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove
     return r === row && c === col;
   };
 
+  const isSelectedForUnblocking = (row: number, col: number): boolean => {
+    if (!unblocking || unblocking.selectedOption === null) return false;
+    const selectedStones = unblocking.options[unblocking.selectedOption];
+    return selectedStones.some(([r, c]) => r === row && c === col);
+  };
+
   const getCellClass = (value: CellValue, row: number, col: number): string => {
     const classes = ['cell'];
 
@@ -50,6 +57,11 @@ export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove
       if (isPendingMove(row, col)) classes.push('pending-move');
       if (isSelectableForDebt(row, col)) classes.push('selectable-for-debt');
       if (isSelectedForDebt(row, col)) classes.push('selected-for-debt');
+    }
+
+    // Unblocking mode - highlight stones that will be removed
+    if (isSelectedForUnblocking(row, col)) {
+      classes.push('selected-for-unblocking');
     }
 
     return classes.join(' ');
@@ -95,9 +107,15 @@ export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove
         {/* Cells */}
         {board.map((row, rowIdx) =>
           row.map((cell, colIdx) => {
-            const isClickable = debtResolution
-              ? isSelectableForDebt(rowIdx, colIdx)
-              : (cell === EMPTY && isLegalMove(rowIdx, colIdx));
+            let isClickable: boolean;
+            if (debtResolution) {
+              isClickable = isSelectableForDebt(rowIdx, colIdx);
+            } else if (unblocking && unblocking.selectedOption !== null) {
+              // When unblocking option is selected, allow clicking empty cells
+              isClickable = cell === EMPTY;
+            } else {
+              isClickable = cell === EMPTY && isLegalMove(rowIdx, colIdx);
+            }
 
             return (
               <button
@@ -105,7 +123,7 @@ export function Board({ board, size, legalMoves, onCellClick, disabled, lastMove
                 className={getCellClass(cell as CellValue, rowIdx, colIdx)}
                 onClick={() => onCellClick(rowIdx, colIdx)}
                 disabled={disabled || !isClickable}
-                aria-label={`Cell ${rowIdx},${colIdx}: ${cell === BLACK ? 'Black' : cell === WHITE ? 'White' : 'Empty'}${isSelectedForDebt(rowIdx, colIdx) ? ' (selected for removal)' : ''}`}
+                aria-label={`Cell ${rowIdx},${colIdx}: ${cell === BLACK ? 'Black' : cell === WHITE ? 'White' : 'Empty'}${isSelectedForDebt(rowIdx, colIdx) ? ' (selected for removal)' : ''}${isSelectedForUnblocking(rowIdx, colIdx) ? ' (will be removed)' : ''}`}
               >
                 {cell !== EMPTY && (
                   <div className={`stone ${cell === BLACK ? 'black-stone' : 'white-stone'}`} />

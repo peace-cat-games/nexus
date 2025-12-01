@@ -94,9 +94,12 @@ class TestForcedUnblockingBasic:
 
         assert len(game.legal_moves()) == 0
 
-        # Black wants to play at (0,0)
-        # Removing (0,1) gives (0,0) a liberty
-        removed = game.make_move(0, 0)
+        # Get unblocking options and choose one
+        options = game._find_all_minimal_unblocking_sets()
+        assert len(options) > 0
+
+        # Black wants to play at (0,0), choosing to remove (0,1)
+        removed = game.make_move(0, 0, unblocking_stones=[(0, 1)])
 
         assert removed is not None
         assert len(removed) == 1
@@ -117,7 +120,9 @@ class TestForcedUnblockingBasic:
             to_move=Player.BLACK,
         )
 
-        game.make_move(0, 0)
+        # Choose one of the unblocking options
+        options = game._find_all_minimal_unblocking_sets()
+        game.make_move(0, 0, unblocking_stones=options[0])
 
         assert game.state.debt_black == 3  # 1 stone * p2=3
 
@@ -174,8 +179,8 @@ class TestForcedUnblockingBasic:
         # Line breaks, game continues
         assert game.result == GameResult.ONGOING
 
-    def test_lexicographic_preference(self):
-        """Among equal-size removal sets, lexicographically smallest is chosen."""
+    def test_multiple_options_returned(self):
+        """All minimal unblocking sets are returned for user to choose."""
         game = NexusGame(size=3, p1=1, p2=2)
         game.set_position(
             [
@@ -188,10 +193,17 @@ class TestForcedUnblockingBasic:
 
         # Try to play at (0,0)
         # Need to remove one of (0,1) or (1,0)
-        # (0,1) is lexicographically smaller than (1,0)
-        removed = game.make_move(0, 0)
+        # Both are valid minimal options
+        options = game._find_all_minimal_unblocking_sets()
 
-        assert removed == [(0, 1)]
+        # Should have multiple options
+        assert len(options) >= 2
+        assert [(0, 1)] in options
+        assert [(1, 0)] in options
+
+        # Player can choose either option
+        removed = game.make_move(0, 0, unblocking_stones=[(1, 0)])
+        assert removed == [(1, 0)]
 
 
 class TestForcedUnblockingImpossible:
@@ -262,7 +274,8 @@ class TestForcedUnblockingWithGameplay:
         # (1,0) neighbors: (0,0)=B, (1,1)=B, (2,0)=empty
         # So (1,0) still has liberty at (2,0) - not captured
 
-        removed = game.make_move(0, 0)
+        # Choose to remove (0,1)
+        removed = game.make_move(0, 0, unblocking_stones=[(0, 1)])
 
         assert removed is not None
         assert (0, 1) in removed  # Removed to unblock
@@ -294,10 +307,13 @@ class TestForcedUnblockingWithGameplay:
         legal = game.legal_moves()
         assert len(legal) == 0
 
-        # Black plays at (0,0) via forced unblock
-        removed = game.make_move(0, 0)
+        # Get unblocking options
+        options = game._find_all_minimal_unblocking_sets()
 
-        # Forced unblock: remove (0,1) to give (0,0) a liberty
+        # Black plays at (0,0) via forced unblock
+        removed = game.make_move(0, 0, unblocking_stones=options[0])
+
+        # Forced unblock: remove a stone to give (0,0) a liberty
         # Place Black at (0,0)
         # No complete line, game continues
         assert removed is not None
@@ -317,7 +333,9 @@ class TestForcedUnblockingWithGameplay:
             to_move=Player.BLACK,
         )
 
-        removed = game.make_move(0, 0)
+        # Get unblocking options
+        options = game._find_all_minimal_unblocking_sets()
+        removed = game.make_move(0, 0, unblocking_stones=options[0])
 
         assert removed is not None
         assert game.result == GameResult.ONGOING
@@ -328,6 +346,63 @@ class TestForcedUnblockingWithGameplay:
 
 class TestForcedUnblockingEdgeCases:
     """Edge cases for forced unblocking."""
+
+    def test_unblocking_required_but_not_provided(self):
+        """ValueError is raised when unblocking is required but not provided."""
+        game = NexusGame(size=3, p1=1, p2=2)
+        game.set_position(
+            [
+                [EMPTY, WHITE, EMPTY],
+                [WHITE, BLACK, WHITE],
+                [EMPTY, WHITE, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        # No legal moves
+        assert len(game.legal_moves()) == 0
+
+        # Try to make move without providing unblocking choice
+        with pytest.raises(ValueError) as exc_info:
+            game.make_move(0, 0)
+
+        assert "Forced unblocking required" in str(exc_info.value)
+
+    def test_invalid_unblocking_choice_rejected(self):
+        """ValueError is raised when invalid unblocking choice is provided."""
+        game = NexusGame(size=3, p1=1, p2=2)
+        game.set_position(
+            [
+                [EMPTY, WHITE, EMPTY],
+                [WHITE, BLACK, WHITE],
+                [EMPTY, WHITE, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        # Try to make move with a non-minimal unblocking set (removing 2 stones when 1 suffices)
+        with pytest.raises(ValueError) as exc_info:
+            game.make_move(0, 0, unblocking_stones=[(0, 1), (1, 0)])
+
+        assert "Invalid unblocking choice" in str(exc_info.value)
+
+    def test_valid_unblocking_wrong_move_raises_suicide(self):
+        """SuicideError is raised when valid unblocking doesn't unblock the chosen move."""
+        game = NexusGame(size=3, p1=1, p2=2)
+        game.set_position(
+            [
+                [EMPTY, WHITE, EMPTY],
+                [WHITE, BLACK, WHITE],
+                [EMPTY, WHITE, EMPTY],
+            ],
+            to_move=Player.BLACK,
+        )
+
+        # (2,1) is a valid unblocking set (unblocks 2,0 and 2,2), but doesn't unblock (0,0)
+        from nexus.exceptions import SuicideError
+
+        with pytest.raises(SuicideError):
+            game.make_move(0, 0, unblocking_stones=[(2, 1)])
 
     def test_has_legal_moves_no_unblocking(self):
         """If legal moves exist, forced unblocking doesn't happen."""
@@ -362,7 +437,9 @@ class TestForcedUnblockingEdgeCases:
         # All corners are suicide for White
         assert len(game.legal_moves()) == 0
 
-        removed = game.make_move(0, 0)
+        # Get unblocking options
+        options = game._find_all_minimal_unblocking_sets()
+        removed = game.make_move(0, 0, unblocking_stones=options[0])
 
         assert removed is not None
         assert len(removed) == 1

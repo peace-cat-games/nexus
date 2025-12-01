@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Board, GameInfo, GameControls } from './components';
-import { GameState, NewGameOptions, DebtResolutionState } from './types';
-import { createGame, makeMove, checkMove } from './api/client';
+import { GameState, NewGameOptions, DebtResolutionState, UnblockingState } from './types';
+import { createGame, makeMove, checkMove, getUnblockingOptions } from './api/client';
 import './App.css';
 
 function App() {
@@ -10,12 +10,43 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [lastMove, setLastMove] = useState<[number, number] | null>(null);
   const [debtResolution, setDebtResolution] = useState<DebtResolutionState | null>(null);
+  const [unblocking, setUnblocking] = useState<UnblockingState | null>(null);
+
+  // Check for forced unblocking when game state changes
+  useEffect(() => {
+    if (!gameState || gameState.result !== 'ONGOING' || debtResolution) return;
+    if (gameState.legal_moves.length > 0) {
+      setUnblocking(null);
+      return;
+    }
+
+    // No legal moves - check for unblocking options
+    const checkUnblocking = async () => {
+      try {
+        const result = await getUnblockingOptions(gameState.game_id);
+        if (result.needs_unblocking && result.options.length > 0) {
+          setUnblocking({
+            options: result.options,
+            selectedOption: null,
+            totalDebt: result.total_debt || 0,
+          });
+          setError(`No legal moves! Select which opponent stones to remove (adds ${result.total_debt} debt).`);
+        } else if (result.impossible) {
+          setError('No legal moves and no way to unblock - game over!');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to check unblocking options');
+      }
+    };
+    checkUnblocking();
+  }, [gameState, debtResolution]);
 
   const handleNewGame = useCallback(async (options: NewGameOptions) => {
     setLoading(true);
     setError(null);
     setLastMove(null);
     setDebtResolution(null);
+    setUnblocking(null);
     try {
       const state = await createGame(options);
       setGameState(state);
@@ -54,6 +85,37 @@ function App() {
       return;
     }
 
+    // If in unblocking mode with a selected option, make the move
+    if (unblocking) {
+      if (unblocking.selectedOption === null) {
+        setError('Select an unblocking option first, then click a move location.');
+        return;
+      }
+      // Make the move with unblocking
+      setLoading(true);
+      setError(null);
+      try {
+        const selectedStones = unblocking.options[unblocking.selectedOption];
+        const response = await makeMove(gameState.game_id, row, col, undefined, selectedStones);
+        setGameState(response.game_state);
+        setLastMove([row, col]);
+        setUnblocking(null);
+
+        if (response.unblocked_stones) {
+          setError(`Removed opponent stones: ${response.unblocked_stones.map(([r, c]) => `(${r},${c})`).join(', ')}`);
+        }
+
+        if (response.message) {
+          setError(response.message);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to make move');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     // Check if this is a legal move
     const isLegal = gameState.legal_moves.some(([r, c]) => r === row && c === col);
     if (!isLegal) {
@@ -87,7 +149,7 @@ function App() {
       setLastMove([row, col]);
 
       if (response.unblocked_stones) {
-        setError(`Forced unblocking removed stones: ${response.unblocked_stones.map(([r, c]) => `(${r},${c})`).join(', ')}`);
+        setError(`Removed opponent stones: ${response.unblocked_stones.map(([r, c]) => `(${r},${c})`).join(', ')}`);
       }
 
       if (response.message) {
@@ -103,7 +165,25 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [gameState, debtResolution]);
+  }, [gameState, debtResolution, unblocking]);
+
+  const handleSelectUnblockingOption = useCallback((index: number) => {
+    if (!unblocking) return;
+    setUnblocking({
+      ...unblocking,
+      selectedOption: index,
+    });
+    setError(`Selected option ${index + 1}. Now click a cell to make your move.`);
+  }, [unblocking]);
+
+  const handleCancelUnblocking = useCallback(() => {
+    if (!unblocking) return;
+    setUnblocking({
+      ...unblocking,
+      selectedOption: null,
+    });
+    setError(`No legal moves! Select which opponent stones to remove (adds ${unblocking.totalDebt} debt).`);
+  }, [unblocking]);
 
   const handleConfirmDebtResolution = useCallback(async () => {
     if (!gameState || !debtResolution) return;
@@ -156,7 +236,7 @@ function App() {
 
       <main className="app-main">
         <aside className="sidebar left">
-          <GameControls onNewGame={handleNewGame} disabled={loading || !!debtResolution} />
+          <GameControls onNewGame={handleNewGame} disabled={loading || !!debtResolution || !!unblocking} />
         </aside>
 
         <section className="game-area">
@@ -164,11 +244,12 @@ function App() {
             <Board
               board={gameState.board}
               size={gameState.size}
-              legalMoves={debtResolution ? [] : gameState.legal_moves}
+              legalMoves={debtResolution || unblocking ? [] : gameState.legal_moves}
               onCellClick={handleCellClick}
               disabled={loading || isGameOver}
               lastMove={lastMove}
               debtResolution={debtResolution}
+              unblocking={unblocking}
             />
           ) : (
             <div className="empty-board-placeholder">
@@ -184,6 +265,9 @@ function App() {
             debtResolution={debtResolution}
             onConfirmDebtResolution={handleConfirmDebtResolution}
             onCancelDebtResolution={handleCancelDebtResolution}
+            unblocking={unblocking}
+            onSelectUnblockingOption={handleSelectUnblockingOption}
+            onCancelUnblocking={handleCancelUnblocking}
           />
         </aside>
       </main>

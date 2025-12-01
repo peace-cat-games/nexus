@@ -679,27 +679,29 @@ class NexusGame:
         # Pass turn
         self.state.to_move = player.opponent()
 
-    def _find_minimal_unblocking_set(self) -> Optional[List[Tuple[int, int]]]:
+    def _find_all_minimal_unblocking_sets(self) -> List[List[Tuple[int, int]]]:
         """
-        Find the minimal set of opponent stones to remove to create a legal move.
+        Find all minimal sets of opponent stones to remove to create a legal move.
 
-        Searches in order of increasing set size until a valid set is found.
-        Within each size, prefers lexicographically smallest sets.
+        Searches in order of increasing set size until valid sets are found.
+        Returns all sets of the minimum size that work.
 
         Returns:
-            List of (row, col) tuples to remove, or None if impossible.
+            List of removal options, where each option is a list of (row, col)
+            tuples. Empty list if no unblocking is possible.
         """
         player = self.state.to_move
         opponent_stones = self._get_player_stones(player.opponent())
 
         if not opponent_stones:
-            return None
+            return []
 
         # Sort for deterministic lexicographic ordering
         opponent_stones.sort()
 
         # Try increasing set sizes
         for size in range(1, len(opponent_stones) + 1):
+            valid_sets = []
             for subset in combinations(opponent_stones, size):
                 # Temporarily remove these stones
                 removed_values = []
@@ -715,22 +717,27 @@ class NexusGame:
                     self.board[r][c] = val
 
                 if has_legal:
-                    return list(subset)
+                    valid_sets.append(list(subset))
 
-        return None
+            # Return all sets of the minimum size that work
+            if valid_sets:
+                return valid_sets
+
+        return []
 
     def make_move(
         self,
         row: int,
         col: int,
         stones_to_remove: Optional[List[Tuple[int, int]]] = None,
+        unblocking_stones: Optional[List[Tuple[int, int]]] = None,
     ) -> Optional[List[Tuple[int, int]]]:
         """
         Make a complete turn, handling forced unblocking if necessary.
 
         This is the main high-level API for making a move. It:
         1. Checks if legal moves exist
-        2. If not, performs forced unblocking (Rule 6)
+        2. If not, performs forced unblocking (Rule 6) using the provided choice
         3. Applies the specified move
         4. Returns any stones removed during forced unblocking
 
@@ -738,6 +745,8 @@ class NexusGame:
             row: Row to place the stone.
             col: Column to place the stone.
             stones_to_remove: For completion debt resolution (see apply_move).
+            unblocking_stones: Required if forced unblocking is needed. Must be
+                one of the minimal unblocking sets from _find_all_minimal_unblocking_sets().
 
         Returns:
             List of opponent stones removed during forced unblocking, or None
@@ -747,6 +756,8 @@ class NexusGame:
             GameOverError: If the game has already ended.
             ForcedUnblockingImpossibleError: If forced unblocking is needed but impossible.
             IllegalMoveError: If the specified move is not legal after unblocking.
+            ValueError: If forced unblocking is needed but unblocking_stones is not provided
+                or is not a valid minimal unblocking set.
         """
         if self.state.result != GameResult.ONGOING:
             raise GameOverError("Cannot make a move: game has already ended")
@@ -757,9 +768,9 @@ class NexusGame:
         # Check if we need forced unblocking
         legal = self.legal_moves()
         if not legal:
-            # Find minimal unblocking set
-            unblock_set = self._find_minimal_unblocking_set()
-            if unblock_set is None:
+            # Find all minimal unblocking sets
+            all_unblock_sets = self._find_all_minimal_unblocking_sets()
+            if not all_unblock_sets:
                 # Cannot unblock: player loses
                 self.state.result = (
                     GameResult.WHITE_WIN
@@ -770,13 +781,32 @@ class NexusGame:
                     f"{player.name} has no legal moves and cannot unblock"
                 )
 
-            # Remove the stones
-            for r, c in unblock_set:
+            # Require the player to choose
+            if unblocking_stones is None:
+                raise ValueError(
+                    f"Forced unblocking required. Must choose from: {all_unblock_sets}"
+                )
+
+            # Validate the provided choice
+            unblocking_stones_sorted = sorted(unblocking_stones)
+            valid_choice = False
+            for valid_set in all_unblock_sets:
+                if sorted(valid_set) == unblocking_stones_sorted:
+                    valid_choice = True
+                    break
+            if not valid_choice:
+                raise ValueError(
+                    f"Invalid unblocking choice: {unblocking_stones}. "
+                    f"Must be one of: {all_unblock_sets}"
+                )
+
+            # Remove the chosen stones
+            for r, c in unblocking_stones:
                 self.board[r][c] = EMPTY
 
             # Add debt for forced unblocking
-            self.state.add_debt(player, len(unblock_set) * self.state.p2)
-            unblocked_stones = unblock_set
+            self.state.add_debt(player, len(unblocking_stones) * self.state.p2)
+            unblocked_stones = unblocking_stones
 
         # Now apply the move
         self.apply_move(row, col, stones_to_remove)

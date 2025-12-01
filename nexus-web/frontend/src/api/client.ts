@@ -1,4 +1,4 @@
-import { GameState, MoveResponse, NewGameOptions, CheckMoveResponse } from '../types';
+import { GameState, MoveResponse, NewGameOptions, CheckMoveResponse, UnblockingOptionsResponse } from '../types';
 
 const API_BASE = '/api';
 
@@ -26,7 +26,8 @@ export async function makeMove(
   gameId: string,
   row: number,
   col: number,
-  stonesToRemove?: [number, number][]
+  stonesToRemove?: [number, number][],
+  unblockingStones?: [number, number][]
 ): Promise<MoveResponse> {
   const response = await fetch(`${API_BASE}/games/${gameId}/move`, {
     method: 'POST',
@@ -35,11 +36,21 @@ export async function makeMove(
       row,
       col,
       stones_to_remove: stonesToRemove,
+      unblocking_stones: unblockingStones,
     }),
   });
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.detail || 'Failed to make move');
+  }
+  return response.json();
+}
+
+export async function getUnblockingOptions(gameId: string): Promise<UnblockingOptionsResponse> {
+  const response = await fetch(`${API_BASE}/games/${gameId}/unblocking-options`);
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to get unblocking options');
   }
   return response.json();
 }

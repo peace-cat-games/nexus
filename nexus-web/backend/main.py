@@ -56,6 +56,10 @@ class MoveRequest(BaseModel):
     stones_to_remove: Optional[List[List[int]]] = Field(
         default=None, description="Stones to remove for debt resolution [[r,c], ...]"
     )
+    unblocking_stones: Optional[List[List[int]]] = Field(
+        default=None,
+        description="Opponent stones to remove for forced unblocking [[r,c], ...]",
+    )
 
 
 class GameStateResponse(BaseModel):
@@ -124,8 +128,15 @@ def make_move(game_id: str, request: MoveRequest) -> MoveResponse:
     if request.stones_to_remove:
         stones_to_remove = [(s[0], s[1]) for s in request.stones_to_remove]
 
+    # Convert unblocking_stones to tuples
+    unblocking_stones = None
+    if request.unblocking_stones:
+        unblocking_stones = [(s[0], s[1]) for s in request.unblocking_stones]
+
     try:
-        unblocked = game.make_move(request.row, request.col, stones_to_remove)
+        unblocked = game.make_move(
+            request.row, request.col, stones_to_remove, unblocking_stones
+        )
         unblocked_list = [[r, c] for r, c in unblocked] if unblocked else None
 
         return MoveResponse(
@@ -142,6 +153,9 @@ def make_move(game_id: str, request: MoveRequest) -> MoveResponse:
     except KoError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except IllegalMoveError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as e:
+        # Forced unblocking required but not provided or invalid
         raise HTTPException(status_code=400, detail=str(e))
     except ForcedUnblockingImpossibleError as e:
         # Game ends, update response
@@ -183,6 +197,43 @@ def get_debt_resolution_info(game_id: str) -> Dict[str, Any]:
 class CheckMoveRequest(BaseModel):
     row: int = Field(ge=0, description="Row coordinate")
     col: int = Field(ge=0, description="Column coordinate")
+
+
+@app.get("/api/games/{game_id}/unblocking-options")
+def get_unblocking_options(game_id: str) -> Dict[str, Any]:
+    """
+    Get available forced unblocking options when player has no legal moves.
+    Returns all minimal unblocking sets for the player to choose from.
+    """
+    if game_id not in games:
+        raise HTTPException(status_code=404, detail="Game not found")
+
+    game = games[game_id]
+    legal = game.legal_moves()
+
+    if legal:
+        return {
+            "needs_unblocking": False,
+            "options": [],
+            "debt_per_stone": game.state.p2,
+        }
+
+    options = game._find_all_minimal_unblocking_sets()
+
+    if not options:
+        return {
+            "needs_unblocking": True,
+            "options": [],
+            "debt_per_stone": game.state.p2,
+            "impossible": True,
+        }
+
+    return {
+        "needs_unblocking": True,
+        "options": [[[r, c] for r, c in opt] for opt in options],
+        "debt_per_stone": game.state.p2,
+        "total_debt": len(options[0]) * game.state.p2,
+    }
 
 
 @app.post("/api/games/{game_id}/check-move")

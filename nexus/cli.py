@@ -62,6 +62,10 @@ During debt resolution:
   When you complete a line with positive net debt, you must choose
   which of your stones to remove. Enter coordinates separated by
   semicolons (e.g., "0,0;1,1;2,2").
+
+During forced unblocking:
+  When you have no legal moves, you must choose which opponent stones
+  to remove. Enter the option number (e.g., "1" or "2").
 """
     )
 
@@ -133,6 +137,35 @@ def parse_stones_to_remove(input_str: str) -> Optional[List[Tuple[int, int]]]:
     return stones
 
 
+def get_unblocking_choice(
+    game: NexusGame, options: List[List[Tuple[int, int]]]
+) -> List[Tuple[int, int]]:
+    """Prompt user to select which opponent stones to remove for forced unblocking."""
+    print(f"\nNo legal moves! You must remove opponent stones to unblock.")
+    print(f"This will add {len(options[0]) * game.state.p2} debt.")
+    print(f"\nChoose which stones to remove:")
+    for i, option in enumerate(options, 1):
+        print(f"  {i}. {option}")
+
+    while True:
+        try:
+            user_input = input("> ").strip()
+            if user_input.lower() == "quit":
+                sys.exit(0)
+
+            choice = int(user_input)
+            if 1 <= choice <= len(options):
+                return options[choice - 1]
+            print(f"Invalid choice. Enter a number from 1 to {len(options)}.")
+        except ValueError:
+            print(f"Invalid input. Enter a number from 1 to {len(options)}.")
+        except EOFError:
+            sys.exit(0)
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            sys.exit(0)
+
+
 def get_stones_to_remove(game: NexusGame, required: int) -> List[Tuple[int, int]]:
     """Prompt user to select stones to remove for debt resolution."""
     player = game.to_move
@@ -201,11 +234,14 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
 
         # Check for forced unblocking situation
         legal = game.legal_moves()
+        unblocking_choice = None
         if not legal:
-            print("No legal moves available!")
-            unblock_set = game._find_minimal_unblocking_set()
-            print(f"Forced unblocking will remove: {unblock_set}")
-            print(f"This will add {len(unblock_set) * p2} debt.")
+            unblock_options = game._find_all_minimal_unblocking_sets()
+            if not unblock_options:
+                print("No legal moves and no way to unblock - you lose!")
+                break
+            unblocking_choice = get_unblocking_choice(game, unblock_options)
+            print_board(game)
 
         # Get user input
         try:
@@ -232,11 +268,18 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
             print_rules()
             continue
         elif user_input == "legal" or user_input == "l":
-            legal = game.legal_moves()
-            if legal:
-                print(f"Legal moves ({len(legal)}): {legal}")
+            if unblocking_choice:
+                # Show what moves will be legal after unblocking
+                print(
+                    f"After removing {unblocking_choice}, legal moves will be available."
+                )
+                print("Enter your move to proceed.")
             else:
-                print("No legal moves! Forced unblocking required.")
+                legal_now = game.legal_moves()
+                if legal_now:
+                    print(f"Legal moves ({len(legal_now)}): {legal_now}")
+                else:
+                    print("No legal moves!")
             continue
 
         # Parse as move
@@ -277,11 +320,10 @@ def play_game(size: int = 5, p1: int = 2, p2: int = 4) -> None:
                     )
                     stones_to_remove = get_stones_to_remove(game, required)
 
-            unblocked = game.make_move(row, col, stones_to_remove)
+            unblocked = game.make_move(row, col, stones_to_remove, unblocking_choice)
 
             if unblocked:
-                print(f"Forced unblocking removed: {unblocked}")
-                print_board(game)
+                print(f"Removed opponent stones: {unblocked}")
 
             if game.result != GameResult.ONGOING:
                 print_board(game)

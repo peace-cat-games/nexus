@@ -39,6 +39,20 @@ export interface DebtResolutionState {
   wouldBeBankrupt: boolean;
 }
 
+export interface UnblockingOptionsResponse {
+  needs_unblocking: boolean;
+  options: [number, number][][];
+  debt_per_stone: number;
+  total_debt?: number;
+  impossible?: boolean;
+}
+
+export interface UnblockingState {
+  options: [number, number][][];
+  selectedOption: number | null;
+  totalDebt: number;
+}
+
 export const EMPTY = 0;
 export const BLACK = 1;
 export const WHITE = 2;

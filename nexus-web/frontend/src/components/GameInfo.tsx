@@ -1,4 +1,4 @@
-import { GameState, DebtResolutionState } from '../types';
+import { GameState, DebtResolutionState, UnblockingState } from '../types';
 import './GameInfo.css';
 
 interface GameInfoProps {
@@ -7,9 +7,12 @@ interface GameInfoProps {
   debtResolution?: DebtResolutionState | null;
   onConfirmDebtResolution?: () => void;
   onCancelDebtResolution?: () => void;
+  unblocking?: UnblockingState | null;
+  onSelectUnblockingOption?: (index: number) => void;
+  onCancelUnblocking?: () => void;
 }
 
-export function GameInfo({ gameState, error, debtResolution, onConfirmDebtResolution, onCancelDebtResolution }: GameInfoProps) {
+export function GameInfo({ gameState, error, debtResolution, onConfirmDebtResolution, onCancelDebtResolution, unblocking, onSelectUnblockingOption, onCancelUnblocking }: GameInfoProps) {
   if (!gameState) {
     return (
       <div className="game-info">
@@ -54,6 +57,37 @@ export function GameInfo({ gameState, error, debtResolution, onConfirmDebtResolu
             </button>
           </div>
         </div>
+      ) : unblocking ? (
+        <div className="unblocking-panel">
+          <h3>Forced Unblocking</h3>
+          <p className="unblocking-info">
+            No legal moves! Choose which opponent stones to remove:
+          </p>
+          <p className="unblocking-debt">
+            (Adds {unblocking.totalDebt} debt)
+          </p>
+          <div className="unblocking-options">
+            {unblocking.options.map((option, index) => (
+              <button
+                key={index}
+                className={`unblocking-option ${unblocking.selectedOption === index ? 'selected' : ''}`}
+                onClick={() => onSelectUnblockingOption?.(index)}
+              >
+                {option.map(([r, c]) => `(${r},${c})`).join(', ')}
+              </button>
+            ))}
+          </div>
+          {unblocking.selectedOption !== null && (
+            <p className="unblocking-instruction">
+              Click an empty cell to make your move
+            </p>
+          )}
+          {unblocking.selectedOption !== null && (
+            <button className="cancel-btn" onClick={onCancelUnblocking}>
+              Change Selection
+            </button>
+          )}
+        </div>
       ) : (
         <div className="turn-indicator">
           <span className={`player-badge ${currentPlayer.toLowerCase()}`}>
@@ -82,11 +116,6 @@ export function GameInfo({ gameState, error, debtResolution, onConfirmDebtResolu
         <span>Board: {gameState.size}x{gameState.size}</span>
       </div>
 
-      {!isGameOver && !debtResolution && gameState.legal_moves.length === 0 && (
-        <div className="warning-message">
-          No legal moves! Forced unblocking required.
-        </div>
-      )}
     </div>
   );
 }
