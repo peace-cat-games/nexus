@@ -41,7 +41,8 @@ export function GamePage() {
   useEffect(() => {
     if (!gameId || !gameState) return;
 
-    // For real-time games, use WebSocket
+    // For real-time games, use WebSocket + polling fallback
+    // Polling is needed because the bot uses REST API, not WebSocket
     if (gameState.mode === 'realtime') {
       wsRef.current = connectToGame(gameId, (data: unknown) => {
         if (data && typeof data === 'object' && 'type' in data) {
@@ -52,10 +53,21 @@ export function GamePage() {
         }
       });
 
+      // Also poll every 2 seconds as fallback for bot games
+      if (gameState.result === 'ONGOING') {
+        pollIntervalRef.current = window.setInterval(() => {
+          loadGame();
+        }, 2000);
+      }
+
       return () => {
         if (wsRef.current) {
           wsRef.current.close();
           wsRef.current = null;
+        }
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
         }
       };
     }

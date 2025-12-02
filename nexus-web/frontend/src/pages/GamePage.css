@@ -72,10 +72,10 @@
 }
 
 .game-main {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 2rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .game-area {
@@ -88,6 +88,8 @@
   border-radius: 8px;
   padding: 1rem;
   border: 1px solid #333;
+  width: 100%;
+  max-width: 500px;
 }
 
 .waiting-message {
@@ -128,12 +130,3 @@
   }
 }
 
-@media (max-width: 900px) {
-  .game-main {
-    grid-template-columns: 1fr;
-  }
-
-  .game-sidebar {
-    order: -1;
-  }
-}

@@ -10,7 +10,9 @@ import {
   GameListItem,
 } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/api`
+  : '/api';
 
 // Token management
 let authToken: string | null = localStorage.getItem('token');
@@ -239,8 +241,18 @@ export async function acceptSeek(seekId: number): Promise<GameState> {
 
 // WebSocket
 export function connectToGame(gameId: string, onMessage: (data: unknown) => void): WebSocket {
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const ws = new WebSocket(`${protocol}//${window.location.host}/ws/game/${gameId}`);
+  let wsUrl: string;
+  if (import.meta.env.VITE_API_BASE_URL) {
+    // Production: connect to backend host
+    const backendUrl = new URL(import.meta.env.VITE_API_BASE_URL);
+    const protocol = backendUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${protocol}//${backendUrl.host}/ws/game/${gameId}`;
+  } else {
+    // Development: use same host (via vite proxy)
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsUrl = `${protocol}//${window.location.host}/ws/game/${gameId}`;
+  }
+  const ws = new WebSocket(wsUrl);
 
   ws.onmessage = (event) => {
     try {

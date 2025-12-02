@@ -282,7 +282,11 @@ class NexusBot:
         return lines
 
     def find_winning_move(
-        self, board: List[List[int]], size: int, legal_moves: List[List[int]], player_stone: int
+        self,
+        board: List[List[int]],
+        size: int,
+        legal_moves: List[List[int]],
+        player_stone: int,
     ) -> Optional[Tuple[int, int]]:
         """Find a move that completes a line for the player."""
         lines = self._get_all_lines(size)
@@ -296,7 +300,11 @@ class NexusBot:
         return None
 
     def find_blocking_move(
-        self, board: List[List[int]], size: int, legal_moves: List[List[int]], player_stone: int
+        self,
+        board: List[List[int]],
+        size: int,
+        legal_moves: List[List[int]],
+        player_stone: int,
     ) -> Optional[Tuple[int, int]]:
         """Find a move that blocks opponent from completing a line."""
         opponent_stone = 3 - player_stone
@@ -363,7 +371,11 @@ class NexusBot:
         return (move[0], move[1])
 
     def select_stones_to_remove(
-        self, player_stones: List[List[int]], count: int, board: List[List[int]], size: int
+        self,
+        player_stones: List[List[int]],
+        count: int,
+        board: List[List[int]],
+        size: int,
     ) -> List[List[int]]:
         """
         Select which stones to remove for debt resolution.
@@ -408,12 +420,16 @@ class NexusBot:
         is_black = game_state.get("player_black_id") == self.user_id
         is_white = game_state.get("player_white_id") == self.user_id
 
-        our_turn = (to_move == "BLACK" and is_black) or (to_move == "WHITE" and is_white)
+        our_turn = (to_move == "BLACK" and is_black) or (
+            to_move == "WHITE" and is_white
+        )
         if not our_turn:
             return False
 
         player_stone = 1 if to_move == "BLACK" else 2
-        logger.info(f"Playing as {'BLACK' if is_black else 'WHITE'} in game {game_id[:8]}...")
+        logger.info(
+            f"Playing as {'BLACK' if is_black else 'WHITE'} in game {game_id[:8]}..."
+        )
 
         # Check for forced unblocking
         unblocking = self.get_unblocking_options(game_id)
@@ -454,7 +470,9 @@ class NexusBot:
         result = self.make_move(game_id, row, col, stones_to_remove, unblocking_stones)
         if result:
             if result.get("success"):
-                logger.info(f"Move successful! Game result: {result['game_state']['result']}")
+                logger.info(
+                    f"Move successful! Game result: {result['game_state']['result']}"
+                )
                 return True
             else:
                 logger.warning(f"Move failed: {result.get('message')}")
@@ -520,7 +538,9 @@ class NexusBot:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Nexus Bot - A simple Nexus playing engine")
+    parser = argparse.ArgumentParser(
+        description="Nexus Bot - A simple Nexus playing engine"
+    )
     parser.add_argument(
         "--server",
         "-s",

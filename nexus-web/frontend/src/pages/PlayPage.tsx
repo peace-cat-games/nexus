@@ -72,6 +72,20 @@ export function PlayPage() {
       setMySeek(null);
       await refreshData();
     } catch (err) {
+      // If the seek wasn't found, it may have been matched - check for new games
+      const [mySeekData, gamesData] = await Promise.all([getMySeek(), getMyGames()]);
+      setMySeek(mySeekData);
+      setMyGames(gamesData);
+
+      if (!mySeekData) {
+        // Seek was matched, check if there's a new ongoing game to navigate to
+        const ongoingGames = gamesData.filter(g => g.result === 'ongoing');
+        if (ongoingGames.length > 0) {
+          // Navigate to the most recent game (likely the one from this seek)
+          navigate(`/game/${ongoingGames[0].id}`);
+          return;
+        }
+      }
       setError(err instanceof Error ? err.message : 'Failed to cancel seek');
     } finally {
       setLoading(false);
