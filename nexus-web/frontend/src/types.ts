@@ -9,6 +9,11 @@ export interface GameState {
   legal_moves: [number, number][];
   p1: number;
   p2: number;
+  mode: 'realtime' | 'correspondence';
+  player_black_id: number | null;
+  player_black_username: string | null;
+  player_white_id: number | null;
+  player_white_username: string | null;
 }
 
 export interface MoveResponse {
@@ -22,6 +27,7 @@ export interface NewGameOptions {
   size: number;
   p1: number;
   p2: number;
+  mode?: 'realtime' | 'correspondence';
 }
 
 export interface CheckMoveResponse {
@@ -51,6 +57,41 @@ export interface UnblockingState {
   options: [number, number][][];
   selectedOption: number | null;
   totalDebt: number;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  created_at: string;
+}
+
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
+}
+
+export interface Seek {
+  id: number;
+  owner_id: number;
+  owner_username: string;
+  mode: 'realtime' | 'correspondence';
+  board_size: number;
+  p1: number;
+  p2: number;
+}
+
+export interface GameListItem {
+  id: string;
+  player_black_id: number | null;
+  player_black_username: string | null;
+  player_white_id: number | null;
+  player_white_username: string | null;
+  mode: 'realtime' | 'correspondence';
+  board_size: number;
+  result: 'ongoing' | 'black_win' | 'white_win';
+  created_at: string;
+  updated_at: string;
 }
 
 export const EMPTY = 0;

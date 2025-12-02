@@ -15,6 +15,11 @@ describe('GameInfo', () => {
     legal_moves: [],
     p1: 2,
     p2: 4,
+    mode: 'realtime',
+    player_black_id: 1,
+    player_black_username: 'player1',
+    player_white_id: 2,
+    player_white_username: 'player2',
   };
 
   it('shows message when no game state', () => {

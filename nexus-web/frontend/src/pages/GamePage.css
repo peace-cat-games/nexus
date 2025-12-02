@@ -1,0 +1,139 @@
+.game-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+}
+
+.loading-message,
+.error-page {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.error-page h2 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.error-page p {
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.players {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.player {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.player.black {
+  background: #222;
+  color: #888;
+}
+
+.player.white {
+  background: #ddd;
+  color: #333;
+}
+
+.player.active {
+  box-shadow: 0 0 0 2px #4a9eff;
+}
+
+.player.you::after {
+  content: ' (you)';
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.vs {
+  color: #555;
+}
+
+.game-mode {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.game-main {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.game-area {
+  display: flex;
+  justify-content: center;
+}
+
+.game-sidebar {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #333;
+}
+
+.waiting-message {
+  text-align: center;
+  padding: 1rem;
+  color: #888;
+  font-style: italic;
+  background: #0a0a0f;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top-color: #4a9eff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .game-main {
+    grid-template-columns: 1fr;
+  }
+
+  .game-sidebar {
+    order: -1;
+  }
+}

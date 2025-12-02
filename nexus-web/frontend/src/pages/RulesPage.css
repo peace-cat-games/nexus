@@ -1,0 +1,143 @@
+.rules-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.rules-content {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid #333;
+}
+
+.rules-content h1 {
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #888;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.rules-content section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #333;
+}
+
+.rules-content section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.rules-content h2 {
+  color: #4a9eff;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.rules-content h3 {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.rules-content p {
+  color: #b0b0b0;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.rules-content ul,
+.rules-content ol {
+  color: #b0b0b0;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  line-height: 1.7;
+}
+
+.rules-content li {
+  margin-bottom: 0.5rem;
+}
+
+.rules-content ul ul,
+.rules-content ol ul,
+.rules-content ul ol,
+.rules-content ol ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rules-content strong {
+  color: #fff;
+}
+
+.rules-content code {
+  background: #0a0a0f;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9em;
+  color: #ffd700;
+}
+
+.rules-content pre {
+  background: #0a0a0f;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.parameters {
+  background: #0a0a0f;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid #4a9eff;
+}
+
+.parameters p {
+  margin-bottom: 0.5rem;
+}
+
+.parameters ul {
+  margin-bottom: 0;
+}
+
+.case {
+  background: #0a0a0f;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.case h3 {
+  margin-top: 0;
+  color: #4a9eff;
+}
+
+.result {
+  font-size: 1.1rem;
+}
+
+.win {
+  color: #4caf50;
+}
+
+.loss {
+  color: #ff4444;
+}
+
+.rules-content em {
+  color: #a0a0a0;
+  font-style: italic;
+}

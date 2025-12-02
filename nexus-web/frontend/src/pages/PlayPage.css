@@ -1,0 +1,193 @@
+.play-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.login-prompt h2 {
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.login-prompt p {
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.login-prompt .btn {
+  margin: 0.5rem;
+}
+
+.play-content {
+  display: grid;
+  gap: 2rem;
+}
+
+section {
+  background: #1a1a2e;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #333;
+}
+
+section h2 {
+  color: #fff;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+section h3 {
+  color: #b0b0b0;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.my-seek {
+  text-align: center;
+  padding: 1rem;
+}
+
+.my-seek p {
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.seek-details {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.create-game-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row label {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button-group .btn {
+  flex: 1;
+}
+
+.error-message {
+  color: #ff4444;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.empty-message {
+  color: #666;
+  text-align: center;
+  padding: 2rem;
+}
+
+.seeks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.seek-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #0a0a0f;
+  border-radius: 4px;
+}
+
+.seek-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.seek-info strong {
+  color: #fff;
+}
+
+.games-group {
+  margin-bottom: 1.5rem;
+}
+
+.games-group:last-child {
+  margin-bottom: 0;
+}
+
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #0a0a0f;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.game-item:hover {
+  background: #151520;
+}
+
+.game-item.finished {
+  opacity: 0.7;
+}
+
+.game-players {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.game-players span {
+  color: #b0b0b0;
+}
+
+.game-players .you {
+  color: #4a9eff;
+  font-weight: 500;
+}
+
+.game-players .vs {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.game-info {
+  display: flex;
+  gap: 1rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.game-result {
+  color: #888;
+  font-size: 0.85rem;
+}
