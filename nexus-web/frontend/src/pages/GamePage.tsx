@@ -72,6 +72,8 @@ export function GamePage() {
         }
       };
     }
+    // Only re-run when mode or result changes, not on every gameState update
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId, gameState?.mode, gameState?.result, loadGame]);
 
   // Check for forced unblocking when game state changes
