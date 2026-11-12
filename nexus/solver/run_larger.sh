@@ -10,7 +10,11 @@ mkdir -p $L
 (cd tools
  python3 difftest.py --n 3 --games 3000 --random 30000 --seed 2 > ../$L/difftest_n3.log
  python3 difftest.py --n 4 --games 2000 --random 15000 --seed 4 --max-turns 120 > ../$L/difftest_n4.log
- python3 difftest.py --n 5 --games 1000 --random 8000 --seed 5 --max-turns 150 > ../$L/difftest_n5.log
+ mkdir -p ../$L/difftest_n5_shards   # 5x5 under game.py is slow: 14 parallel shards
+ for i in $(seq 0 13); do
+   python3 difftest.py --n 5 --games 10 --random 100 --seed $((500+i)) --max-turns 150 > ../$L/difftest_n5_shards/seed$((500+i)).log &
+ done
+ wait
  python3 crosscheck_tt.py --n 3 --lines 60 --depth 10 --seed 3 > ../$L/crosscheck_tt_n3.log
  python3 crosscheck_tt.py --n 4 --lines 40 --depth 8 --seed 4 > ../$L/crosscheck_tt_n4.log
  python3 crosscheck_tt.py --n 5 --lines 20 --depth 6 --seed 5 > ../$L/crosscheck_tt_n5.log

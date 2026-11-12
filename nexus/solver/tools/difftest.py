@@ -109,6 +109,7 @@ def main():
     ap.add_argument("--max-turns", type=int, default=80)
     a = ap.parse_args()
     pyref.set_size(a.n)
+    pyref.enable_unblocking_memo()
     rng = random.Random(a.seed)
     lines, expected = [], []
     stats = {"positions": 0, "nomove": 0, "illdef": 0, "unblock": 0, "audit_choice": 0, "ko_limited": 0}

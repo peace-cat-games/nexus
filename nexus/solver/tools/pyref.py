@@ -31,6 +31,37 @@ NOMOVE = "NOMOVE"
 ILLDEF = "ILLDEF"
 
 
+_MEMO_ON = False
+
+
+def enable_unblocking_memo():
+    """Memoize game.py's _find_all_minimal_unblocking_sets on the complete
+    game state (board, side to move, both debts, p1, p2, superko history).
+
+    The method is a pure function of that state, so this changes speed only,
+    not results.  make_move recomputes the sets for every turn it validates,
+    which makes enumerating all turns of a 5x5 unblocking position very slow.
+    """
+    global _MEMO_ON
+    if _MEMO_ON:
+        return
+    _MEMO_ON = True
+    orig = NexusGame._find_all_minimal_unblocking_sets
+    cache = {}
+
+    def memo(self):
+        st = self.state
+        key = (tuple(tuple(r) for r in self.board), st.to_move, st.debt_black, st.debt_white, st.p1, st.p2,
+               frozenset(st.position_history))
+        if key not in cache:
+            if len(cache) > 200000:
+                cache.clear()
+            cache[key] = [list(s) for s in orig(self)]
+        return [list(s) for s in cache[key]]
+
+    NexusGame._find_all_minimal_unblocking_sets = memo
+
+
 def rc(i):
     return divmod(i, N)
 
