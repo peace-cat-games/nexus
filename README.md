@@ -15,7 +15,7 @@ Nexus is a perfect-information, deterministic, two-player game played on an n×n
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/nexus.git
+git clone https://github.com/peace-cat-games/nexus.git
 cd nexus
 
 # Install in development mode
@@ -165,3 +165,10 @@ nexus/
 └── README.md
 ```
 
+## Research
+
+3×3 Nexus with the default parameters (p1 = 2, p2 = 4) is a first-player win. The solver and the independent checker that prove it are at [haapavesi-institute/nexus-solver](https://github.com/haapavesi-institute/nexus-solver).
+
+## License
+
+Copyright 2025–2026 Ian Joiner. Licensed under the Apache License, Version 2.0 (see [LICENSE](LICENSE)).

@@ -2,6 +2,9 @@
 Authentication utilities for Nexus Web.
 """
 
+import os
+import secrets
+import warnings
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -16,9 +19,15 @@ from database import get_db
 from models import User
 
 # Configuration
-SECRET_KEY = (
-    "REDACTED-set-the-SECRET_KEY-environment-variable"  # Should be env variable in production
-)
+# The JWT signing key comes from the SECRET_KEY environment variable. Without it,
+# a random key is generated for this process (sessions end when it restarts);
+# there is deliberately no fixed default, because this code is public.
+SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(48)
+if not os.environ.get("SECRET_KEY"):
+    warnings.warn(
+        "SECRET_KEY is not set: using a random per-process key. "
+        "Set SECRET_KEY in production so sessions survive restarts."
+    )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 1 week
 
