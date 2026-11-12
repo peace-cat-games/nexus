@@ -61,7 +61,7 @@ def main():
     a = ap.parse_args()
     pyref.set_size(a.n)
     rng = random.Random(a.seed)
-    bad = done = with_removal = 0
+    bad = done = with_removal = wins = 0
     while done < a.lines:
         line, rem = random_line(rng, a.n, 4, 4 * a.n * a.n)
         if rem == 0 and rng.random() < 0.8:
@@ -70,12 +70,13 @@ def main():
         for side in ("black", "white"):
             r1 = run(a.n, line, side, a.depth, True)
             r2 = run(a.n, line, side, a.depth, False)
+            wins += r2[-1:] == ["WIN"]
             if r1 != r2:
                 bad += 1
                 print("MISMATCH", side, " ".join(line), r1, r2)
         done += 1
     print(f"n={a.n}: {done} start lines ({with_removal} with captures/removals), both sides, depth <= {a.depth}: "
-          f"{bad} mismatches")
+          f"{bad} mismatches ({wins} of the {2 * done} runs found a forced win within the depth)")
 
 
 if __name__ == "__main__":

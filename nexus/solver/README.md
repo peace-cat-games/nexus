@@ -253,3 +253,31 @@ remove own stones 3 and 5 in the audit".
 ```
 cd nexus/solver && ./run_all.sh     # build, difftest, solve, check (~3 min)
 ```
+
+# Larger boards (4×4, 5×5) and complexity measurements
+
+* `src/game.rs` now handles any n ≤ 5 (n²-bit masks, 128-bit superko keys);
+  the 3×3 trees above regenerate byte for byte. `tools/` take the size
+  (`difftest.py --n N`; the checker reads `n=` from the tree header).
+* `nexus-solver prove --n N --side black|white` (`src/prove.rs`) decides
+  "X forces a win within d turns" by iterative deepening: an AND/OR search
+  over exact histories, with
+  - a **sound, history-aware transposition table**: a stored result carries
+    θ = fewest stones on any board whose superko key its search looked up,
+    plus a 128-bit hash of the history keys with ≥ θ stones; it is reused only
+    when the current history hashes the same above θ (proof in
+    `prove.rs` and the paper's larger-boards section). `--no-tt-values`
+    turns reuse off (ordering only = pure exact search);
+  - two history-free horizon cut-offs (X needs a line it lacks ≤ 1 stone of to
+    win on its last turn);
+  - exact strategy extraction as before, for `check_strategy.py`.
+* `tools/crosscheck_tt.py` compares reuse vs pure exact search per depth from
+  random capture-rich start lines (`results/larger/crosscheck_tt_*.log`).
+* `run_larger.sh` reruns the differential tests, cross-checks and the four
+  45-minute searches; logs are in `results/larger/`.
+* `complexity/` and `src/bin/complexity.rs`: board counts (exact for n ≤ 4,
+  Monte Carlo for n = 5), Go reachability, the Nexus debt-pumping cycle
+  (`verify_cycle.py` replays it through game.py), random playouts for Go,
+  Enhanced Go and Nexus (`run_playouts.sh`), and the cross-check of the Rust
+  Enhanced Go rules against the Peace Cat Games TypeScript engine
+  (`ego_ts_count.mjs`, run with `node --experimental-strip-types`).
