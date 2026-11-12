@@ -1,0 +1,83 @@
+tree ../results/opening_4.txt: winner BLACK, max game length 18 turns
+after -/4/-: replies and remaining length:
+   -/1/-: game over within 17 more turns
+   -/3/-: game over within 17 more turns
+   -/5/-: game over within 17 more turns
+   -/7/-: game over within 17 more turns
+   -/2/-: game over within 16 more turns
+   -/6/-: game over within 16 more turns
+   -/8/-: game over within 16 more turns
+   -/0/-: game over within 13 more turns
+principal variation (longest resistance):
+ 1. BLACK (1, 1)   debts B=0 W=0   
+    . . .
+    . X .
+    . . .
+ 2. WHITE (0, 1)   debts B=0 W=0   
+    . O .
+    . X .
+    . . .
+ 3. BLACK (1, 0)   debts B=0 W=0   
+    . O .
+    X X .
+    . . .
+ 4. WHITE (1, 2)   debts B=0 W=0   
+    . O .
+    X X O
+    . . .
+ 5. BLACK (2, 1)   debts B=0 W=0   
+    . O .
+    X X O
+    . X .
+ 6. WHITE (0, 2)   debts B=0 W=0   
+    . O O
+    X X O
+    . X .
+ 7. BLACK (0, 0)   debts B=0 W=0   
+    X O O
+    X X O
+    . X .
+ 8. WHITE unblocks [(2, 1)] then plays (2, 1)   debts B=0 W=4   
+    X O O
+    X X O
+    . O .
+ 9. BLACK (2, 2), removes [(0, 0), (2, 2)] in the audit   debts B=0 W=0   
+    . . .
+    X X .
+    . O .
+10. WHITE (1, 2)   debts B=0 W=0   
+    . . .
+    X X O
+    . O .
+11. BLACK (0, 1)   debts B=0 W=0   
+    . X .
+    X X O
+    . O .
+12. WHITE (0, 2)   debts B=0 W=0   
+    . X O
+    X X O
+    . O .
+13. BLACK (2, 0)   debts B=0 W=0   
+    . X O
+    X X O
+    X O .
+14. WHITE (0, 0)   debts B=0 W=8   
+    O . O
+    . . O
+    . O .
+15. BLACK (1, 0)   debts B=0 W=8   
+    O . O
+    X . O
+    . O .
+16. WHITE (1, 1)   debts B=0 W=8   
+    O . O
+    X O O
+    . O .
+17. BLACK (0, 1)   debts B=2 W=8   
+    . X O
+    X O O
+    . O .
+18. WHITE (2, 0)   debts B=2 W=8   -> BLACK_WIN
+    . X O
+    X O O
+    O O .
