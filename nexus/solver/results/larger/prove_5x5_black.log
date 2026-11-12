@@ -1,0 +1,19 @@
+# prove n=5 p1=2 p2=4 side=black line=[] tt_values=true max_tt=4000000 time_limit=2700s
+depth  1: no forced win  nodes 1 (total 1)  tt 0  hits 0  illdef 0  theta 255  0.0s (total 0.0s)  rss 2MB
+depth  2: no forced win  nodes 26 (total 27)  tt 26  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  3: no forced win  nodes 26 (total 53)  tt 26  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  4: no forced win  nodes 626 (total 679)  tt 350  hits 276  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  5: no forced win  nodes 626 (total 1305)  tt 350  hits 552  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  6: no forced win  nodes 7340 (total 8645)  tt 3105  hits 4829  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth  7: no forced win  nodes 7337 (total 15982)  tt 3211  hits 9106  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth  8: no forced win  nodes 58720 (total 74702)  tt 20937  hits 47081  illdef 0  theta 1  0.0s (total 0.0s)  rss 4MB
+depth  9: no forced win  nodes 62249 (total 136951)  tt 24431  hits 86319  illdef 0  theta 1  0.0s (total 0.1s)  rss 4MB
+depth 10: no forced win  nodes 350071 (total 487022)  tt 107085  hits 327213  illdef 0  theta 1  0.1s (total 0.2s)  rss 11MB
+depth 11: no forced win  nodes 400718 (total 887740)  tt 139424  hits 593414  illdef 0  theta 1  0.2s (total 0.4s)  rss 21MB
+depth 12: no forced win  nodes 2491064 (total 3378804)  tt 404016  hits 2466158  illdef 0  theta 1  1.1s (total 1.5s)  rss 39MB
+depth 13: no forced win  nodes 4891614 (total 8270418)  tt 1625025  hits 5372627  illdef 0  theta 1  3.2s (total 4.7s)  rss 149MB
+depth 14: no forced win  nodes 48092790 (total 56363208)  tt 4000000  hits 36868529  illdef 0  theta 1  26.3s (total 31.0s)  rss 590MB
+depth 15: no forced win  nodes 134341155 (total 190704363)  tt 4000000  hits 73858724  illdef 0  theta 1  109.7s (total 140.7s)  rss 590MB
+depth 16: no forced win  nodes 1785380009 (total 1976084372)  tt 4000000  hits 123700234  illdef 0  theta 1  2168.1s (total 2308.8s)  rss 590MB
+depth 17: TIMEOUT after 394745964 nodes, 391.2s (depth not completed)
+RESULT: Black has no forced win within 16 turns (exact search, depths 1..=16)

@@ -1,0 +1,26 @@
+# prove n=4 p1=2 p2=4 side=white line=[] tt_values=true max_tt=6000000 time_limit=2700s
+depth  1: no forced win  nodes 1 (total 1)  tt 1  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  2: no forced win  nodes 1 (total 2)  tt 1  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  3: no forced win  nodes 17 (total 19)  tt 17  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  4: no forced win  nodes 17 (total 36)  tt 17  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  5: no forced win  nodes 227 (total 263)  tt 136  hits 91  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  6: no forced win  nodes 227 (total 490)  tt 166  hits 182  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  7: no forced win  nodes 1545 (total 2035)  tt 770  hits 1001  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  8: no forced win  nodes 1685 (total 3720)  tt 1068  hits 1825  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  9: no forced win  nodes 7235 (total 10955)  tt 3713  hits 5538  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth 10: no forced win  nodes 5191 (total 16146)  tt 5217  hits 7569  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth 11: no forced win  nodes 18061 (total 34207)  tt 10601  hits 16452  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth 12: no forced win  nodes 27566 (total 61773)  tt 21662  hits 25814  illdef 0  theta 1  0.0s (total 0.0s)  rss 5MB
+depth 13: no forced win  nodes 151169 (total 212942)  tt 56787  hits 78808  illdef 0  theta 1  0.1s (total 0.1s)  rss 7MB
+depth 14: no forced win  nodes 253940 (total 466882)  tt 117878  hits 147206  illdef 0  theta 1  0.2s (total 0.3s)  rss 21MB
+depth 15: no forced win  nodes 886938 (total 1353820)  tt 223578  hits 357204  illdef 0  theta 1  0.7s (total 1.0s)  rss 21MB
+depth 16: no forced win  nodes 1188911 (total 2542731)  tt 423205  hits 614267  illdef 0  theta 1  1.1s (total 2.1s)  rss 39MB
+depth 17: no forced win  nodes 3336597 (total 5879328)  tt 579809  hits 1230654  illdef 0  theta 1  3.2s (total 5.3s)  rss 76MB
+depth 18: no forced win  nodes 2764741 (total 8644069)  tt 784993  hits 1725874  illdef 0  theta 1  3.0s (total 8.3s)  rss 76MB
+depth 19: no forced win  nodes 23240436 (total 31884505)  tt 1156406  hits 7790095  illdef 0  theta 1  20.6s (total 29.0s)  rss 149MB
+depth 20: no forced win  nodes 25242390 (total 57126895)  tt 1907145  hits 12447664  illdef 0  theta 1  26.6s (total 55.6s)  rss 296MB
+depth 21: no forced win  nodes 120667952 (total 177794847)  tt 2674630  hits 35044470  illdef 0  theta 1  131.7s (total 187.2s)  rss 296MB
+depth 22: no forced win  nodes 120166407 (total 297961254)  tt 3906239  hits 54318755  illdef 0  theta 1  141.6s (total 328.8s)  rss 590MB
+depth 23: no forced win  nodes 679263439 (total 977224693)  tt 5192855  hits 163012064  illdef 0  theta 1  1361.1s (total 1689.9s)  rss 590MB
+depth 24: TIMEOUT after 717536267 nodes, 1010.1s (depth not completed)
+RESULT: White has no forced win within 23 turns (exact search, depths 1..=23)

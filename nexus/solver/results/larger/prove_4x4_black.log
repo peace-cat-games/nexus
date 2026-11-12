@@ -1,0 +1,23 @@
+# prove n=4 p1=2 p2=4 side=black line=[] tt_values=true max_tt=6000000 time_limit=2700s
+depth  1: no forced win  nodes 1 (total 1)  tt 0  hits 0  illdef 0  theta 255  0.0s (total 0.0s)  rss 2MB
+depth  2: no forced win  nodes 17 (total 18)  tt 17  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  3: no forced win  nodes 17 (total 35)  tt 17  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  4: no forced win  nodes 257 (total 292)  tt 152  hits 105  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  5: no forced win  nodes 257 (total 549)  tt 152  hits 210  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  6: no forced win  nodes 1841 (total 2390)  tt 858  hits 1196  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  7: no forced win  nodes 2083 (total 4473)  tt 1136  hits 2202  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  8: no forced win  nodes 9010 (total 13483)  tt 3713  hits 7484  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth  9: no forced win  nodes 14041 (total 27524)  tt 7316  hits 13751  illdef 0  theta 1  0.0s (total 0.0s)  rss 3MB
+depth 10: no forced win  nodes 43667 (total 71191)  tt 17838  hits 38060  illdef 0  theta 1  0.0s (total 0.0s)  rss 4MB
+depth 11: no forced win  nodes 133103 (total 204294)  tt 83741  hits 79654  illdef 0  theta 1  0.1s (total 0.1s)  rss 11MB
+depth 12: no forced win  nodes 293566 (total 497860)  tt 157330  hits 201286  illdef 0  theta 1  0.2s (total 0.3s)  rss 20MB
+depth 13: no forced win  nodes 572886 (total 1070746)  tt 315710  hits 372952  illdef 0  theta 1  0.4s (total 0.7s)  rss 39MB
+depth 14: no forced win  nodes 2095178 (total 3165924)  tt 487429  hits 950100  illdef 0  theta 1  1.5s (total 2.2s)  rss 76MB
+depth 15: no forced win  nodes 4522276 (total 7688200)  tt 1156017  hits 1971849  illdef 0  theta 1  3.7s (total 5.9s)  rss 149MB
+depth 16: no forced win  nodes 21081341 (total 28769541)  tt 1834205  hits 6208383  illdef 0  theta 1  18.0s (total 23.9s)  rss 149MB
+depth 17: no forced win  nodes 42201658 (total 70971199)  tt 3805872  hits 13579942  illdef 0  theta 1  41.6s (total 65.5s)  rss 590MB
+depth 18: no forced win  nodes 189305322 (total 260276521)  tt 5456634  hits 51295072  illdef 0  theta 1  165.2s (total 230.8s)  rss 590MB
+depth 19: no forced win  nodes 256408179 (total 516684700)  tt 6000000  hits 91390070  illdef 0  theta 1  479.6s (total 710.4s)  rss 590MB
+depth 20: no forced win  nodes 1265302215 (total 1781986915)  tt 6000000  hits 202732029  illdef 0  theta 1  1388.9s (total 2099.3s)  rss 590MB
+depth 21: TIMEOUT after 628361629 nodes, 600.7s (depth not completed)
+RESULT: Black has no forced win within 20 turns (exact search, depths 1..=20)

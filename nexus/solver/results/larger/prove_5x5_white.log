@@ -1,0 +1,19 @@
+# prove n=5 p1=2 p2=4 side=white line=[] tt_values=true max_tt=4000000 time_limit=2700s
+depth  1: no forced win  nodes 1 (total 1)  tt 1  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  2: no forced win  nodes 1 (total 2)  tt 1  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  3: no forced win  nodes 26 (total 28)  tt 26  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  4: no forced win  nodes 26 (total 54)  tt 26  hits 0  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  5: no forced win  nodes 578 (total 632)  tt 325  hits 253  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  6: no forced win  nodes 578 (total 1210)  tt 373  hits 506  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  7: no forced win  nodes 6536 (total 7746)  tt 2846  hits 4310  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  8: no forced win  nodes 6526 (total 14272)  tt 3324  hits 8121  illdef 0  theta 1  0.0s (total 0.0s)  rss 2MB
+depth  9: no forced win  nodes 50142 (total 64414)  tt 18551  hits 40385  illdef 0  theta 1  0.0s (total 0.0s)  rss 4MB
+depth 10: no forced win  nodes 50587 (total 115001)  tt 24594  hits 71967  illdef 0  theta 1  0.0s (total 0.1s)  rss 4MB
+depth 11: no forced win  nodes 199037 (total 314038)  tt 76015  hits 201981  illdef 0  theta 1  0.1s (total 0.1s)  rss 11MB
+depth 12: no forced win  nodes 216975 (total 531013)  tt 122501  hits 333177  illdef 0  theta 1  0.1s (total 0.3s)  rss 20MB
+depth 13: no forced win  nodes 1341287 (total 1872300)  tt 419100  hits 1245353  illdef 0  theta 1  0.7s (total 0.9s)  rss 39MB
+depth 14: no forced win  nodes 3160261 (total 5032561)  tt 1198896  hits 3130272  illdef 0  theta 1  2.0s (total 3.0s)  rss 149MB
+depth 15: no forced win  nodes 23472559 (total 28505120)  tt 3306250  hits 17481657  illdef 0  theta 1  14.8s (total 17.7s)  rss 296MB
+depth 16: no forced win  nodes 123445055 (total 151950175)  tt 4000000  hits 27874534  illdef 0  theta 1  116.4s (total 134.1s)  rss 590MB
+depth 17: TIMEOUT after 2098162849 nodes, 2565.9s (depth not completed)
+RESULT: White has no forced win within 16 turns (exact search, depths 1..=16)
