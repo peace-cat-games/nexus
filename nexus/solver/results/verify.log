@@ -1,0 +1,44 @@
+## results/strategy_p1-2_p2-4.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 199, 'winner_nodes': 99, 'loser_nodes': 21, 'leaves': 79, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12960kB
+## results/strategy_tt_p1-2_p2-4.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 199, 'winner_nodes': 99, 'loser_nodes': 21, 'leaves': 79, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.06s maxrss 12960kB
+## results/opening_0.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 199, 'winner_nodes': 99, 'loser_nodes': 21, 'leaves': 79, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.06s maxrss 12800kB
+## results/opening_1.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 203, 'winner_nodes': 101, 'loser_nodes': 26, 'leaves': 76, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12800kB
+## results/opening_2.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 207, 'winner_nodes': 103, 'loser_nodes': 22, 'leaves': 82, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.06s maxrss 12640kB
+## results/opening_3.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 197, 'winner_nodes': 96, 'loser_nodes': 27, 'leaves': 74, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12800kB
+## results/opening_4.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 2744, 'winner_nodes': 1238, 'loser_nodes': 367, 'leaves': 1139, 'loser_cannot_move': 0, 'max_len': 18, 'illdef': 0}
+checker wall 0.89s maxrss 12960kB
+## results/opening_5.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 230, 'winner_nodes': 112, 'loser_nodes': 33, 'leaves': 85, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12640kB
+## results/opening_6.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 241, 'winner_nodes': 120, 'loser_nodes': 27, 'leaves': 94, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.08s maxrss 12480kB
+## results/opening_7.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 248, 'winner_nodes': 118, 'loser_nodes': 48, 'leaves': 82, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12800kB
+## results/opening_8.txt
+VERIFIED: BLACK wins 3x3 Nexus (p1=2, p2=4) from the empty board, Black to move.
+{'nodes': 241, 'winner_nodes': 120, 'loser_nodes': 26, 'leaves': 95, 'loser_cannot_move': 0, 'max_len': 9, 'illdef': 0}
+checker wall 0.07s maxrss 12800kB

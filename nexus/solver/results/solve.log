@@ -1,0 +1,166 @@
+## root, exact mode (no TT)
+depth  1: Unk(1)  nodes 10  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 92  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 678  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 4240  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 15674  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 46820  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 102686  tt 0  illdef 0  0.0s
+depth  8: Unk(8)  nodes 219806  tt 0  illdef 0  0.0s
+depth  9: Win(9)  nodes 224253  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=-1 tt=false root value (side to move = Black): Win(9)
+search nodes 224253 tt entries 0 time 0.02s
+extracted BLACK strategy for BLACK: 198 nodes (79 leaves), max game length 9 turns, extraction nodes 120, illdef-in-tree 0, 0.00s -> results/strategy_p1-2_p2-4.txt
+	Command being timed: "./target/release/nexus-solver solve --no-tt --time 600 --max-depth 30 --out results/strategy_p1-2_p2-4.txt"
+	User time (seconds): 0.01
+	System time (seconds): 0.00
+	Percent of CPU this job got: 90%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.02
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1760
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 101
+	Voluntary context switches: 1
+	Involuntary context switches: 2
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+## root, TT mode
+depth  1: Unk(1)  nodes 10  tt 1  illdef 0  0.0s
+depth  2: Unk(2)  nodes 92  tt 10  illdef 0  0.0s
+depth  3: Unk(3)  nodes 678  tt 82  illdef 0  0.0s
+depth  4: Unk(4)  nodes 2752  tt 334  illdef 0  0.0s
+depth  5: Unk(5)  nodes 6866  tt 1090  illdef 0  0.0s
+depth  6: Unk(6)  nodes 13816  tt 2202  illdef 0  0.0s
+depth  7: Unk(7)  nodes 23869  tt 3665  illdef 0  0.0s
+depth  8: Unk(8)  nodes 35492  tt 5074  illdef 0  0.0s
+depth  9: Win(9)  nodes 36001  tt 5171  illdef 0  0.0s
+p1=2 p2=4 first=-1 tt=true root value (side to move = Black): Win(9)
+search nodes 36001 tt entries 5171 time 0.01s
+extracted BLACK strategy for BLACK: 198 nodes (79 leaves), max game length 9 turns, extraction nodes 120, illdef-in-tree 0, 0.00s -> results/strategy_tt_p1-2_p2-4.txt
+## opening 0, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 475  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1690  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5003  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 7574  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 14221  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 18667  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=0 tt=false root value (side to move = White): Loss(8)
+search nodes 18667 tt entries 0 time 0.00s
+extracted BLACK strategy for BLACK: 198 nodes (79 leaves), max game length 9 turns, extraction nodes 119, illdef-in-tree 0, 0.00s -> results/opening_0.txt
+## opening 1, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 463  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1872  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5773  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 13691  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 33249  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 66554  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=1 tt=false root value (side to move = White): Loss(8)
+search nodes 66554 tt entries 0 time 0.01s
+extracted BLACK strategy for BLACK: 202 nodes (76 leaves), max game length 9 turns, extraction nodes 126, illdef-in-tree 0, 0.00s -> results/opening_1.txt
+## opening 2, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 475  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1690  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5003  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 8679  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 19312  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 33740  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=2 tt=false root value (side to move = White): Loss(8)
+search nodes 33740 tt entries 0 time 0.00s
+extracted BLACK strategy for BLACK: 206 nodes (82 leaves), max game length 9 turns, extraction nodes 124, illdef-in-tree 0, 0.00s -> results/opening_2.txt
+## opening 3, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 463  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1872  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5773  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 14182  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 28577  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 49927  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=3 tt=false root value (side to move = White): Loss(8)
+search nodes 49927 tt entries 0 time 0.01s
+extracted BLACK strategy for BLACK: 196 nodes (74 leaves), max game length 9 turns, extraction nodes 122, illdef-in-tree 0, 0.00s -> results/opening_3.txt
+## opening 4, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 475  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1412  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 3701  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 8782  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 24127  tt 0  illdef 0  0.0s
+depth  8: Unk(8)  nodes 55484  tt 0  illdef 0  0.0s
+depth  9: Unk(9)  nodes 151551  tt 0  illdef 0  0.0s
+depth 10: Unk(10)  nodes 413714  tt 0  illdef 0  0.0s
+depth 11: Unk(11)  nodes 1092853  tt 0  illdef 0  0.1s
+depth 12: Unk(12)  nodes 3023516  tt 0  illdef 0  0.2s
+depth 13: Unk(13)  nodes 4482592  tt 0  illdef 0  0.3s
+depth 14: Unk(14)  nodes 7423151  tt 0  illdef 0  0.4s
+depth 15: Unk(15)  nodes 13622365  tt 0  illdef 0  0.8s
+depth 16: Unk(16)  nodes 28928211  tt 0  illdef 0  1.7s
+depth 17: Loss(17)  nodes 35293441  tt 0  illdef 0  2.1s
+p1=2 p2=4 first=4 tt=false root value (side to move = White): Loss(17)
+search nodes 35293441 tt entries 0 time 2.11s
+extracted BLACK strategy for BLACK: 2743 nodes (1139 leaves), max game length 18 turns, extraction nodes 1604, illdef-in-tree 0, 0.46s -> results/opening_4.txt
+## opening 5, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 463  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1872  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5773  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 15380  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 30907  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 58753  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=5 tt=false root value (side to move = White): Loss(8)
+search nodes 58753 tt entries 0 time 0.01s
+extracted BLACK strategy for BLACK: 229 nodes (85 leaves), max game length 9 turns, extraction nodes 144, illdef-in-tree 0, 0.00s -> results/opening_5.txt
+## opening 6, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 475  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1690  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5003  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 9120  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 21843  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 38724  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=6 tt=false root value (side to move = White): Loss(8)
+search nodes 38724 tt entries 0 time 0.00s
+extracted BLACK strategy for BLACK: 240 nodes (94 leaves), max game length 9 turns, extraction nodes 146, illdef-in-tree 0, 0.00s -> results/opening_6.txt
+## opening 7, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 463  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1872  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5773  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 15756  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 23768  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 43801  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=7 tt=false root value (side to move = White): Loss(8)
+search nodes 43801 tt entries 0 time 0.00s
+extracted BLACK strategy for BLACK: 247 nodes (82 leaves), max game length 9 turns, extraction nodes 165, illdef-in-tree 0, 0.00s -> results/opening_7.txt
+## opening 8, exact mode (no TT)
+depth  1: Unk(1)  nodes 9  tt 0  illdef 0  0.0s
+depth  2: Unk(2)  nodes 74  tt 0  illdef 0  0.0s
+depth  3: Unk(3)  nodes 475  tt 0  illdef 0  0.0s
+depth  4: Unk(4)  nodes 1690  tt 0  illdef 0  0.0s
+depth  5: Unk(5)  nodes 5003  tt 0  illdef 0  0.0s
+depth  6: Unk(6)  nodes 9506  tt 0  illdef 0  0.0s
+depth  7: Unk(7)  nodes 23785  tt 0  illdef 0  0.0s
+depth  8: Loss(8)  nodes 40196  tt 0  illdef 0  0.0s
+p1=2 p2=4 first=8 tt=false root value (side to move = White): Loss(8)
+search nodes 40196 tt entries 0 time 0.00s
+extracted BLACK strategy for BLACK: 240 nodes (95 leaves), max game length 9 turns, extraction nodes 145, illdef-in-tree 0, 0.00s -> results/opening_8.txt
