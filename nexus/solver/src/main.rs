@@ -3,8 +3,10 @@
 //!
 //! Modes:
 //!   nexus-solver movegen            read positions on stdin, print every turn + outcome
-//!   nexus-solver solve [options]    iterative-deepening search + exact strategy extraction
+//!   nexus-solver solve [options]    iterative-deepening search + exact strategy extraction (3-valued)
+//!   nexus-solver prove [options]    "does X force a win within d turns?" (see prove.rs)
 mod game;
+mod prove;
 
 use game::*;
 use std::collections::HashMap;
@@ -13,10 +15,17 @@ use std::io::{BufRead, Write};
 use std::time::Instant;
 
 #[derive(Default)]
-struct MixHasher(u64);
+pub struct MixHasher(u64);
 impl Hasher for MixHasher {
-    fn write(&mut self, _: &[u8]) {
-        unimplemented!()
+    fn write(&mut self, bytes: &[u8]) {
+        for &b in bytes {
+            self.write_u64(self.0 ^ b as u64);
+        }
+    }
+    fn write_u128(&mut self, x: u128) {
+        self.write_u64(x as u64);
+        let lo = self.0;
+        self.write_u64((x >> 64) as u64 ^ lo.rotate_left(17));
     }
     fn write_u64(&mut self, x: u64) {
         let mut z = x.wrapping_add(0x9E37_79B9_7F4A_7C15);
@@ -28,7 +37,7 @@ impl Hasher for MixHasher {
         self.0
     }
 }
-type Map<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
+type Map<V> = HashMap<u128, V, BuildHasherDefault<MixHasher>>;
 
 /// Value from the point of view of the side to move.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -42,6 +51,7 @@ enum V {
 }
 
 struct Solver {
+    g: Geom,
     prm: Params,
     tt: Map<V>,
     nodes: u64,
@@ -73,7 +83,7 @@ impl Solver {
     /// Depth-limited negamax.  `hist` is the exact superko history of the path,
     /// so every ko test made here is exact; the transposition table, keyed on
     /// the position without history, is the only heuristic part (see README).
-    fn search(&mut self, pos: &Pos, hist: &mut Vec<u64>, depth: u16) -> V {
+    fn search(&mut self, pos: &Pos, hist: &mut Vec<u128>, depth: u16) -> V {
         self.nodes += 1;
         if self.nodes & 0xFFFF == 0 && Instant::now() > self.deadline {
             self.timed_out = true;
@@ -92,7 +102,7 @@ impl Solver {
         if depth == 0 {
             return V::Unk(0);
         }
-        let res = match gen(pos, hist, self.prm, false) {
+        let res = match gen(&self.g, pos, hist, self.prm, false) {
             Gen::NoMove => V::Loss(0),
             Gen::IllDefined => {
                 self.illdef += 1;
@@ -103,7 +113,7 @@ impl Solver {
                     V::Win(1)
                 } else {
                     let mut worst = 0u16;
-                    let mut kids: Vec<(u32, Pos, u64)> = Vec::with_capacity(v.len());
+                    let mut kids: Vec<(u32, Pos, u128)> = Vec::with_capacity(v.len());
                     for (_, o) in &v {
                         match o {
                             Outcome::MoverLoses => worst = worst.max(1),
@@ -148,23 +158,23 @@ impl Solver {
     /// history, no transposition cut-offs (the table only orders the prover's
     /// candidate moves).  Appends the subtree below `pos` to `out` in preorder
     /// as (turn, #children) and returns the number of children of `pos`.
-    fn extract(&mut self, pos: &Pos, hist: &mut Vec<u64>, depth_left: u32, prover: u8, out: &mut Vec<(String, u32)>) -> Option<u32> {
+    fn extract(&mut self, pos: &Pos, hist: &mut Vec<u128>, depth_left: u32, prover: u8, out: &mut Vec<(String, u32)>) -> Option<u32> {
         self.ex_nodes += 1;
         if self.ex_nodes > self.ex_budget {
             return None;
         }
         self.ex_maxdepth = self.ex_maxdepth.max(hist.len() as u32);
-        let g = gen(pos, hist, self.prm, false);
+        let g = gen(&self.g, pos, hist, self.prm, false);
         if pos.stm == prover {
             let Gen::Turns(v) = g else { return None };
             if let Some((t, _)) = v.iter().find(|(_, o)| matches!(o, Outcome::MoverWins)) {
-                out.push((turn_string(t), 0));
+                out.push((self.g.turn_string(t), 0));
                 return Some(1);
             }
             if depth_left <= 1 {
                 return None;
             }
-            let mut kids: Vec<(u32, Turn, Pos, u64)> = v
+            let mut kids: Vec<(u32, Turn, Pos, u128)> = v
                 .iter()
                 .filter_map(|(t, o)| match o {
                     Outcome::Cont(p, k) => Some((self.prio(p), *t, *p, *k)),
@@ -184,7 +194,7 @@ impl Solver {
                     }
                 }
                 let mark = out.len();
-                out.push((turn_string(&t), 0));
+                out.push((self.g.turn_string(&t), 0));
                 hist.push(k);
                 let r = self.extract(&p, hist, depth_left - 1, prover, out);
                 hist.pop();
@@ -214,14 +224,14 @@ impl Solver {
                     for (t, o) in &v {
                         n += 1;
                         match o {
-                            Outcome::MoverLoses => out.push((turn_string(t), 0)),
+                            Outcome::MoverLoses => out.push((self.g.turn_string(t), 0)),
                             Outcome::Cont(p, k) => {
                                 if depth_left <= 1 {
                                     out.truncate(start);
                                     return None;
                                 }
                                 let mark = out.len();
-                                out.push((turn_string(t), 0));
+                                out.push((self.g.turn_string(t), 0));
                                 hist.push(*k);
                                 let r = self.extract(p, hist, depth_left - 1, prover, out);
                                 hist.pop();
@@ -246,17 +256,23 @@ impl Solver {
 fn movegen() {
     let stdin = std::io::stdin();
     let mut so = std::io::BufWriter::new(std::io::stdout());
+    let mut geom: Option<Geom> = None;
     for line in stdin.lock().lines() {
         let line = line.unwrap();
         let f: Vec<&str> = line.split_whitespace().collect();
         if f.is_empty() {
             continue;
         }
+        let n = size_of_board_string(f[3]);
+        if geom.as_ref().map_or(true, |g| g.n != n) {
+            geom = Some(Geom::new(n));
+        }
+        let g = geom.as_ref().unwrap();
         let prm = Params { p1: f[0].parse().unwrap(), p2: f[1].parse().unwrap() };
         let stm: u8 = f[2].parse().unwrap();
         let (b, w) = parse_board(f[3]);
         let pos = Pos { b, w, db: f[4].parse().unwrap(), dw: f[5].parse().unwrap(), stm };
-        let hist: Vec<u64> = f[6..]
+        let hist: Vec<u128> = f[6..]
             .iter()
             .map(|e| {
                 let (bs, d) = e.split_once(':').unwrap();
@@ -264,7 +280,7 @@ fn movegen() {
                 ko_key(hb, hw, d.parse().unwrap())
             })
             .collect();
-        let s = match gen(&pos, &hist, prm, true) {
+        let s = match gen(g, &pos, &hist, prm, true) {
             Gen::NoMove => "NOMOVE".to_string(),
             Gen::IllDefined => "ILLDEF".to_string(),
             Gen::Turns(v) => {
@@ -274,9 +290,9 @@ fn movegen() {
                         let os = match o {
                             Outcome::MoverWins => "MW".to_string(),
                             Outcome::MoverLoses => "ML".to_string(),
-                            Outcome::Cont(p, _) => format!("C:{}:{}:{}", p.board_string(), p.db, p.dw),
+                            Outcome::Cont(p, _) => format!("C:{}:{}:{}", g.board_string(p.b, p.w), p.db, p.dw),
                         };
-                        format!("{}={}", turn_string(t), os)
+                        format!("{}={}", g.turn_string(t), os)
                     })
                     .collect();
                 items.sort();
@@ -303,8 +319,10 @@ fn solve(args: &[String]) {
     let out_path: String = arg(args, "--out", "strategy.txt".to_string());
     let first: i32 = arg(args, "--first", -1);
     let use_tt = !args.iter().any(|a| a == "--no-tt");
+    let bsize: usize = arg(args, "--n", 3);
     let t0 = Instant::now();
     let mut s = Solver {
+        g: Geom::new(bsize),
         prm,
         tt: Map::default(),
         nodes: 0,
@@ -323,10 +341,10 @@ fn solve(args: &[String]) {
     // Optional forced first move for Black (analysis of each opening move).
     let mut prefix: Option<String> = None;
     if first >= 0 {
-        let Gen::Turns(v) = gen(&root, &hist, prm, false) else { unreachable!() };
+        let Gen::Turns(v) = gen(&s.g, &root, &hist, prm, false) else { unreachable!() };
         let (t, o) = v.iter().find(|(t, _)| t.place as i32 == first).expect("illegal first move");
         let Outcome::Cont(p, k) = o else { unreachable!() };
-        prefix = Some(turn_string(t));
+        prefix = Some(s.g.turn_string(t));
         root = *p;
         hist.push(*k);
     }
@@ -410,14 +428,17 @@ fn solve(args: &[String]) {
     let mut f = std::io::BufWriter::new(std::fs::File::create(&out_path).unwrap());
     writeln!(
         f,
-        "# nexus 3x3 strategy p1={} p2={} winner={} first={}",
+        "# nexus {}x{} strategy{} p1={} p2={} winner={} first={}",
+        bsize,
+        bsize,
+        if bsize == 3 { String::new() } else { format!(" n={}", bsize) },
         prm.p1,
         prm.p2,
         winner,
         prefix.as_deref().unwrap_or("any")
     )
     .unwrap();
-    writeln!(f, "# preorder; each line: <turn> <number of children>; turn = unblock/place/remove cells (r*3+c), '-' = none").unwrap();
+    writeln!(f, "# preorder; each line: <turn> <number of children>; turn = unblock/place/remove cells (r*{}+c), '-' = none", bsize).unwrap();
     for (t, c) in &out {
         writeln!(f, "{} {}", t, c).unwrap();
     }
@@ -441,6 +462,7 @@ fn main() {
     match args.get(1).map(|s| s.as_str()) {
         Some("movegen") => movegen(),
         Some("solve") => solve(&args[2..]),
-        _ => eprintln!("usage: nexus-solver movegen | solve [--p1 N --p2 N --max-depth D --time S --out FILE]"),
+        Some("prove") => prove::prove(&args[2..]),
+        _ => eprintln!("usage: nexus-solver movegen | solve [--n N --p1 N --p2 N --max-depth D --time S --out FILE] | prove --n N --side black|white [...]"),
     }
 }

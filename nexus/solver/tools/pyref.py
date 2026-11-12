@@ -1,8 +1,8 @@
-"""Turn enumeration for 3x3 Nexus built only on the reference engine nexus/game.py.
+"""Turn enumeration for n×n Nexus (n = 3, 4, 5) built only on the reference engine nexus/game.py.
 
 A *turn* is (S, m, R): S = opponent stones removed by forced unblocking (or None),
 m = the placed point, R = own stones removed in a completion audit (or None).
-Cells are encoded i = 3*row + col.  Everything that decides legality or outcome
+Cells are encoded i = n*row + col (set_size(n) selects n; default 3).  Everything that decides legality or outcome
 is computed by game.py itself (legal_moves, _find_all_minimal_unblocking_sets,
 make_move, _resolve_completion); this module only enumerates the choices that
 game.py leaves to the mover (which minimal unblocking set, which placement,
@@ -19,6 +19,14 @@ from nexus.game import NexusGame, Player, GameResult, BLACK, WHITE, EMPTY  # noq
 from nexus.exceptions import ForcedUnblockingImpossibleError  # noqa: E402
 
 N = 3
+
+
+def set_size(n):
+    """Select the board size used by every function in this module."""
+    global N
+    N = n
+
+
 NOMOVE = "NOMOVE"
 ILLDEF = "ILLDEF"
 
@@ -101,14 +109,19 @@ def apply_turn(game, turn):
 
 
 def turn_str(turn):
+    """Cells as digits for n = 3 (the 3x3 tree format), comma-separated otherwise."""
     S, m, R = turn
-    f = lambda x: "-" if not x else "".join(str(i) for i in sorted(x))
+    sep = "" if N <= 3 else ","
+    f = lambda x: "-" if not x else sep.join(str(i) for i in sorted(x))
     return f"{f(S)}/{m}/{f(R)}"
 
 
 def parse_turn(s):
     a, m, b = s.split("/")
-    g = lambda x: None if x == "-" else tuple(int(ch) for ch in x)
+    if N <= 3:
+        g = lambda x: None if x == "-" else tuple(int(ch) for ch in x)
+    else:
+        g = lambda x: None if x == "-" else tuple(int(t) for t in x.split(","))
     return (g(a), int(m), g(b))
 
 

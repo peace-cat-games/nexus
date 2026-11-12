@@ -1,0 +1,4 @@
+n=3 exact: boards 3^9 = 19683  Go-legal 12675  Go-legal with no monochrome full line 7649
+n=3 Go boards reachable from the empty board (BFS; passes allowed, so either colour may move): 12675
+n=4 exact: boards 3^16 = 43046721  Go-legal 24318165  Go-legal with no monochrome full line 19458797
+n=4 Go boards reachable from the empty board (BFS; passes allowed, so either colour may move): 24318165

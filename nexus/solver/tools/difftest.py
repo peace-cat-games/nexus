@@ -10,7 +10,7 @@ boards with random debts, random side to move and histories seeded with keys
 that one placement from the position would recreate (forcing ko hits), with a
 bias towards nearly full boards (forced unblocking).
 
-usage: python3 difftest.py [--games G] [--random R] [--seed S]
+usage: python3 difftest.py [--n N] [--games G] [--random R] [--seed S] [--max-turns T]
 """
 
 import argparse
@@ -19,6 +19,7 @@ import subprocess
 import sys
 import os
 
+import pyref
 from pyref import (
     NexusGame, Player, BLACK, WHITE, EMPTY, NOMOVE, ILLDEF,
     canonical, enumerate_turns, apply_turn, clone, position_line,
@@ -37,7 +38,7 @@ def pick_params(rng):
 def playouts(rng, games, max_turns=80):
     for _ in range(games):
         p1, p2 = pick_params(rng)
-        g = NexusGame(size=3, p1=p1, p2=p2)
+        g = NexusGame(size=pyref.N, p1=p1, p2=p2)
         for _ in range(max_turns):
             yield g
             turns = enumerate_turns(g)
@@ -53,8 +54,8 @@ def one_step_keys(g):
     keys = []
     player = g.state.to_move
     stone = BLACK if player == Player.BLACK else WHITE
-    for r in range(3):
-        for c in range(3):
+    for r in range(pyref.N):
+        for c in range(pyref.N):
             if g.board[r][c] != EMPTY:
                 continue
             h = clone(g)
@@ -68,14 +69,16 @@ def one_step_keys(g):
 def random_positions(rng, count):
     for _ in range(count):
         p1, p2 = pick_params(rng)
-        g = NexusGame(size=3, p1=p1, p2=p2)
-        empties = rng.choice([0, 0, 1, 1, 2, 3, 4, 5, 9])
-        cells = list(range(9))
+        n = pyref.N
+        g = NexusGame(size=n, p1=p1, p2=p2)
+        choices = [0, 0, 1, 1, 2, 3, 4, 5, 9] if n == 3 else [0, 0, 1, 1, 2, 3, 4, 5, n * n // 3, n * n // 2, n * n]
+        empties = rng.choice(choices)
+        cells = list(range(n * n))
         rng.shuffle(cells)
-        board = [[EMPTY] * 3 for _ in range(3)]
+        board = [[EMPTY] * n for _ in range(n)]
         pb = rng.random()
         for i in cells[empties:]:
-            board[i // 3][i % 3] = BLACK if rng.random() < pb else WHITE
+            board[i // n][i % n] = BLACK if rng.random() < pb else WHITE
         to_move = rng.choice([Player.BLACK, Player.WHITE])
         g.set_position(board, to_move=to_move, debt_black=rng.choice([0, 0, 2, 4, 6, 8, 12, rng.randint(0, 20)]),
                        debt_white=rng.choice([0, 0, 2, 4, 6, 8, 12, rng.randint(0, 20)]))
@@ -86,7 +89,7 @@ def random_positions(rng, count):
         # keys of positions one removal away (relevant to unblocking sets)
         for _ in range(rng.randint(0, 4)):
             h = clone(g)
-            occ = [(r, c) for r in range(3) for c in range(3) if h.board[r][c] != EMPTY]
+            occ = [(r, c) for r in range(pyref.N) for c in range(pyref.N) if h.board[r][c] != EMPTY]
             if occ:
                 r, c = rng.choice(occ)
                 h.board[r][c] = EMPTY
@@ -102,11 +105,14 @@ def main():
     ap.add_argument("--games", type=int, default=300)
     ap.add_argument("--random", type=int, default=3000)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--n", type=int, default=3)
+    ap.add_argument("--max-turns", type=int, default=80)
     a = ap.parse_args()
+    pyref.set_size(a.n)
     rng = random.Random(a.seed)
     lines, expected = [], []
     stats = {"positions": 0, "nomove": 0, "illdef": 0, "unblock": 0, "audit_choice": 0, "ko_limited": 0}
-    gens = [playouts(rng, a.games), random_positions(rng, a.random)]
+    gens = [playouts(rng, a.games, a.max_turns), random_positions(rng, a.random)]
     for gen in gens:
         for g in gen:
             exp = canonical(g)
@@ -138,7 +144,7 @@ def main():
             if bad <= 5:
                 print("MISMATCH\n  pos:  ", ln, "\n  py:   ", e, "\n  rust: ", r)
     print(stats)
-    print(f"{len(expected)} positions compared, {bad} mismatches")
+    print(f"n={a.n}: {len(expected)} positions compared, {bad} mismatches")
     sys.exit(1 if bad else 0)
 
 

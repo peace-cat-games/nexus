@@ -1,0 +1,2 @@
+start X.X.X.OXO WHITE to move, diff 2; after laps 1..200: diffs [0, -2, -4, -6, -8] ... [-394, -396, -398]
+debts after 200 laps: Black 402, White 800; history size 407; all 407 turns accepted by game.py

@@ -2,7 +2,7 @@
 
 The tree file (written by `nexus-solver solve`) lists nodes in preorder, one per
 line: `<turn> <number of children>`; the first node is `root`.  A turn is
-`S/m/R` (unblocking set / placed cell / audit-removal set, cells r*3+c, '-' =
+`S/m/R` (unblocking set / placed cell / audit-removal set, cells r*n+c; n from the header, default 3, '-' =
 none).  The checker replays every turn through game.py's make_move, starting
 from a fresh NexusGame (so the superko history is exactly the one game.py
 builds along that line of play), and verifies:
@@ -25,6 +25,7 @@ usage: python3 check_strategy.py STRATEGY_FILE
 """
 
 import sys
+import pyref
 from pyref import (
     NexusGame, Player, GameResult, NOMOVE, ILLDEF, ForcedUnblockingImpossibleError,
     enumerate_turns, apply_turn, clone, turn_str, parse_turn, board_str,
@@ -49,6 +50,8 @@ def main(path):
             t, c = line.split()
             nodes.append((t, int(c)))
     p1, p2 = int(header["p1"]), int(header["p2"])
+    n = int(header.get("n", "3"))
+    pyref.set_size(n)
     winner = Player.BLACK if header["winner"] == "BLACK" else Player.WHITE
     win_res = GameResult.BLACK_WIN if winner == Player.BLACK else GameResult.WHITE_WIN
     stats = {"nodes": len(nodes), "winner_nodes": 0, "loser_nodes": 0, "leaves": 0,
@@ -127,12 +130,11 @@ def main(path):
     root, rc_ = nxt()
     if root != "root":
         raise CheckError("first node must be root")
-    game = NexusGame(size=3, p1=p1, p2=p2)
+    game = NexusGame(size=n, p1=p1, p2=p2)
     verify(game, rc_, 0)
     if pos[0] != len(nodes):
         raise CheckError("trailing nodes in tree file")
-    print(f"VERIFIED: {winner.name} wins 3x3 Nexus (p1={p1}, p2={p2}) from the empty board, "
-          f"{'Black' if True else ''} to move.")
+    print(f"VERIFIED: {winner.name} wins {n}x{n} Nexus (p1={p1}, p2={p2}) from the empty board, Black to move.")
     print(stats)
 
 

@@ -1,0 +1,2 @@
+660 positions (300 3x3, 300 4x4, 60 5x5) from egodump seeds 21/22/23: Rust egocount vs TS engine (ego_ts_count.mjs): 0 mismatches in (ordinary, special, distinct successors); 249 positions with legal special turns, 186440 special turns compared
+12 of 660 positions where superko removes at least one turn

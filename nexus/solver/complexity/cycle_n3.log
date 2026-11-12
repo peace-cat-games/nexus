@@ -1,0 +1,4 @@
+n=3 non-terminal (board, side) nodes reachable by line-free placements: 7504
+start node: board X.X.X.OXO side 1
+path from empty board (7 turns): -/0/- -/1/- -/2/- -/6/- -/4/- -/8/- -/7/-
+lap (2 turns, debt-difference change -2 per lap): 0/1/- -/0/-

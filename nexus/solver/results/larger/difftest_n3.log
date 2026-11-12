@@ -1,0 +1,6 @@
+{'positions': 58856, 'nomove': 2183, 'illdef': 0, 'unblock': 10694, 'audit_choice': 5444, 'ko_limited': 15499}
+n=3: 58856 positions compared, 0 mismatches
+
+real	2m40.044s
+user	2m40.029s
+sys	0m0.037s

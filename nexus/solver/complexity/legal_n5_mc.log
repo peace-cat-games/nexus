@@ -1,0 +1,2 @@
+n=5 Monte Carlo (2000000000 uniform boards): Go-legal fraction 0.488973 ± 0.000011 (1 s.e.) => count 4.14302e11 ± 9.47e6
+n=5 Monte Carlo (2000000000 uniform boards): Go-legal, no monochrome full line fraction 0.446502 ± 0.000011 (1 s.e.) => count 3.78316e11 ± 9.42e6
