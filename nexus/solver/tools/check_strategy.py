@@ -19,11 +19,14 @@ builds along that line of play), and verifies:
 
 Because the tree is finite, this proves the claimed winner wins from the
 initial position against every opponent strategy, and that every such game
-ends within the tree's depth.
+ends within the tree's depth.  If the header names a forced opening
+(`first=` other than `any`), those turns are replayed as given and the claim
+is about the position after them.
 
 usage: python3 check_strategy.py STRATEGY_FILE
 """
 
+import re
 import sys
 import pyref
 from pyref import (
@@ -131,10 +134,27 @@ def main(path):
     if root != "root":
         raise CheckError("first node must be root")
     game = NexusGame(size=n, p1=p1, p2=p2)
-    verify(game, rc_, 0)
+    # A forced opening (header first=..., written for `--first` / `--line`
+    # runs) is replayed as given; the claim is about the position after it.
+    first = header.get("first", "any")
+    opening = [] if first == "any" else re.findall(r"(?:-|\d+(?:,\d+)*)/\d+/(?:-|\d+(?:,\d+)*)", first)
+    for ft in opening:
+        if rc_ != 1:
+            raise CheckError("forced opening node must have one child")
+        t, rc_ = nxt()
+        if t != ft:
+            raise CheckError(f"tree does not start with the forced opening {ft}")
+        turns = enumerate_turns(game)
+        if turns in (NOMOVE, ILLDEF) or parse_turn(t) not in turns:
+            raise CheckError(f"opening turn {t} not legal in game.py")
+        apply_turn(game, parse_turn(t))
+        if game.result != GameResult.ONGOING:
+            raise CheckError("opening ends the game")
+    verify(game, rc_, len(opening))
     if pos[0] != len(nodes):
         raise CheckError("trailing nodes in tree file")
-    print(f"VERIFIED: {winner.name} wins {n}x{n} Nexus (p1={p1}, p2={p2}) from the empty board, Black to move.")
+    where = "from the empty board, Black to move" if not opening else f"after the opening {','.join(opening)}"
+    print(f"VERIFIED: {winner.name} wins {n}x{n} Nexus (p1={p1}, p2={p2}) {where}.")
     print(stats)
 
 

@@ -208,7 +208,37 @@ each line. At each node it checks the following.
   and no internal node is a finished game.
 
 All 11 tree files in `results/` pass (`results/verify.log`; the main tree
-takes 0.07 s, the centre tree 0.9 s).
+takes 0.07 s, the centre tree 0.9 s). A tree whose header names a forced
+opening (`first=` other than `any`) has those turns replayed as given; the
+claim is then about the position after them.
+
+### Second checker: the Peace Cat Games engine (`tools/check_strategy_ts.mjs`)
+The site at peacecatgames.com plays Nexus with its own engine, a TypeScript
+port of `game.py` (`games/nexus/engine` in the site's repository). It differs
+from `game.py` in three ways: a payment may not name the same stone twice, a
+turn that fails part-way changes nothing, and the designer's draw rule
+(2n² consecutive turns without a capture, 18 on 3×3; or agreement). The
+second checker uses only that engine: `turnStatus` (placement, unblocking with
+its options, or blocked), `preview` (a placement after a given unblocking:
+legal or not, whether it completes a line, the stones owed, the stones that
+can pay) and `playTurn` (a whole turn, including the blocked-opponent loss and
+the draw rule). It applies the same three requirements as the first checker.
+
+```
+node --experimental-strip-types tools/check_strategy_ts.mjs \
+    ../../peace-cat-games/games/nexus/engine results/*.txt
+```
+
+All 11 trees pass with the draw rule on (`results/verify_site.log`). The
+longest capture-free stretch in any line is 7 turns (corner and edge trees)
+and 9 (centre tree). `--no-draw` turns the draw rule off; `--quiet-limit K`
+sets another limit, for testing.
+
+`tools/mutation_test.py ENGINE_DIR` writes six corrupted trees (an illegal
+winning turn, a duplicated reply, a missing reply, a winning turn replaced by
+a non-winning one, the wrong winner, a tree relabelled with other prices) and
+requires both checkers to reject each, and the site checker to score the
+centre tree a draw with the limit lowered to 5 (`results/mutation_test.log`).
 
 ## Numbers
 
@@ -274,10 +304,61 @@ cd nexus/solver && ./run_all.sh     # build, difftest, solve, check (~3 min)
 * `tools/crosscheck_tt.py` compares reuse vs pure exact search per depth from
   random capture-rich start lines (`results/larger/crosscheck_tt_*.log`).
 * `run_larger.sh` reruns the differential tests, cross-checks and the four
-  45-minute searches; logs are in `results/larger/`.
+  45-minute searches; logs are in `results/larger/`. Differential tests:
+  n = 4, 54,704 positions; n = 5, 1,227 positions from 30 of 32 small shards
+  (two hit the 25-minute cap; `game.py` is slow on crowded 5×5 boards because
+  it re-enumerates the minimum unblocking sets for every turn it validates);
+  0 mismatches.
 * `complexity/` and `src/bin/complexity.rs`: board counts (exact for n ≤ 4,
   Monte Carlo for n = 5), Go reachability, the Nexus debt-pumping cycle
   (`verify_cycle.py` replays it through game.py), random playouts for Go,
   Enhanced Go and Nexus (`run_playouts.sh`), and the cross-check of the Rust
   Enhanced Go rules against the Peace Cat Games TypeScript engine
   (`ego_ts_count.mjs`, run with `node --experimental-strip-types`).
+
+# Other debt prices (3×3)
+
+`tools/sweep_params.py` repeats the 3×3 analysis for other prices. For each
+pair (p1, p2) and each of Black's three distinct first moves (corner `-/0/-`,
+edge `-/1/-`, centre `-/4/-`; the rules are symmetric under the 8 symmetries
+of the square), two `prove` runs race, one for each side, each limited to 60
+turns and 120 s; when one proves a win the other is stopped. Every proved win
+is extracted (`results/params/trees/`). `tools/check_params.sh ENGINE_DIR`
+checks every tree with both checkers, and `tools/summarize_params.py` prints
+the grids and writes `results/params/summary.csv` (`results/params/summary.txt`
+holds its output). `tools/params_figure.py` draws the paper's figure.
+
+Runs: every pair from {0, …, 20, 32, 100, 1000}² (576 pairs), plus 112 pairs
+on both sides of each boundary line below: 688 pairs, 1,849 runs, 1,773
+strategy trees. Every tree passes both checkers (`results/params/check_gamepy.log`,
+`results/params/check_site.log`, site checker with the draw rule on; the
+longest capture-free stretch in any line is 9 turns). The undefined case (I6)
+never occurred.
+
+Results (B*d* / W*d*: Black / White forces a win within *d* turns from the
+empty board; every statement holds at every pair tested, with no exception):
+
+* **The empty board is a Black win at all 576 grid pairs.**
+* **p1 ≤ 1:** every first move wins; corner and edge within 7 turns.
+* **Centre:** for p1 ≥ 2 it wins exactly when p2 ≥ 3·p1 − 2 (B18 on the line,
+  W15 one below it, for every p1 from 2 to 1000). The default (2, 4) is on the
+  line. In the centre principal variation, Black's turn-9 audit has
+  net = 3·p1 − p2 with four stones; the boundary is where it passes from 2 to 3.
+* **Corner:** for p1 ≥ 3 it loses exactly when p2 ≥ 4·p1 − 2 (B16 one below
+  the line, W19 on it, for every p1 from 3 to 1000).
+* **Edge:** for p1 ≥ 3 it wins for p2 ≤ 5·p1 − 5 (B17 on that line) and is
+  undecided for p2 ≥ 5·p1 − 4: Black has no forced win within 28–61 turns and
+  White none within 25–26 (76 runs).
+* **Step:** for p1 ≥ 3, the shortest corner win grows from 9 to 10 turns, and
+  the edge win from 9 to 14, at p2 = p1 + 2.
+
+Wherever the corner loses, the centre wins (4·p1 − 2 ≥ 3·p1 − 2), which is why
+the empty board is always a Black win. The lines are observed, not proved,
+beyond the pairs tested.
+
+```
+python3 tools/sweep_params.py --values 0-20,32,100,1000 --jobs 8
+python3 tools/sweep_params.py --pairs P1:P2,... --starts centre --resume   # boundary probes
+tools/check_params.sh ../../peace-cat-games/games/nexus/engine 12
+python3 tools/summarize_params.py
+```

@@ -1,0 +1,23 @@
+# site engine: peace-cat-games 71c496b (games/nexus/engine), node v22.14.0
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [any]: results/strategy_p1-2_p2-4.txt
+{"nodes":199,"winnerNodes":99,"loserNodes":21,"leaves":79,"maxLen":9,"maxQuiet":7,"reasons":{"line":75,"bankruptcy":1,"line-kept":3}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [any]: results/strategy_tt_p1-2_p2-4.txt
+{"nodes":199,"winnerNodes":99,"loserNodes":21,"leaves":79,"maxLen":9,"maxQuiet":7,"reasons":{"line":75,"bankruptcy":1,"line-kept":3}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/0/-]: results/opening_0.txt
+{"nodes":199,"winnerNodes":98,"loserNodes":21,"leaves":79,"maxLen":9,"maxQuiet":7,"reasons":{"line":75,"bankruptcy":1,"line-kept":3}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/1/-]: results/opening_1.txt
+{"nodes":203,"winnerNodes":100,"loserNodes":26,"leaves":76,"maxLen":9,"maxQuiet":7,"reasons":{"line":68,"line-kept":7,"bankruptcy":1}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/2/-]: results/opening_2.txt
+{"nodes":207,"winnerNodes":102,"loserNodes":22,"leaves":82,"maxLen":9,"maxQuiet":7,"reasons":{"line":78,"line-kept":3,"bankruptcy":1}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/3/-]: results/opening_3.txt
+{"nodes":197,"winnerNodes":95,"loserNodes":27,"leaves":74,"maxLen":9,"maxQuiet":7,"reasons":{"line":64,"line-kept":5,"bankruptcy":5}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/4/-]: results/opening_4.txt
+{"nodes":2744,"winnerNodes":1237,"loserNodes":367,"leaves":1139,"maxLen":18,"maxQuiet":9,"reasons":{"line":658,"bankruptcy":268,"line-kept":213}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/5/-]: results/opening_5.txt
+{"nodes":230,"winnerNodes":111,"loserNodes":33,"leaves":85,"maxLen":9,"maxQuiet":7,"reasons":{"line":70,"line-kept":9,"bankruptcy":6}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/6/-]: results/opening_6.txt
+{"nodes":241,"winnerNodes":119,"loserNodes":27,"leaves":94,"maxLen":9,"maxQuiet":7,"reasons":{"line":90,"line-kept":3,"bankruptcy":1}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/7/-]: results/opening_7.txt
+{"nodes":248,"winnerNodes":117,"loserNodes":48,"leaves":82,"maxLen":9,"maxQuiet":7,"reasons":{"line":61,"line-kept":9,"bankruptcy":12}}
+VERIFIED (site engine): black wins 3x3 Nexus (p1=2, p2=4) after [-/8/-]: results/opening_8.txt
+{"nodes":241,"winnerNodes":119,"loserNodes":26,"leaves":95,"maxLen":9,"maxQuiet":7,"reasons":{"line":91,"line-kept":3,"bankruptcy":1}}

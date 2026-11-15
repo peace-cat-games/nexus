@@ -1,0 +1,22 @@
+ok   illegal_winner_turn
+      game.py: CHECK FAILED: winner turn -/9/- not legal in game.py
+      site:    CHECK FAILED: mutant_illegal_winner_turn.txt: winner turn -/9/- is not legal in the site engine
+ok   duplicated_reply
+      game.py: CHECK FAILED: loser reply -/1/- missing from game.py's list or duplicated
+      site:    CHECK FAILED: mutant_duplicated_reply.txt: loser reply -/1/- missing from the site engine's list or duplicated
+ok   missing_reply
+      game.py: CHECK FAILED: loser node: tree has 7 replies, game.py allows 8 at X........ debts 0/0
+      site:    CHECK FAILED: mutant_missing_reply.txt: loser node: tree has 7 replies, the site engine allows 8 at 100000000 debts 0/0
+ok   winning_turn_replaced
+      game.py: CHECK FAILED: loser node: tree has 0 replies, game.py allows 3 at XOOX...X. debts 0/0
+      site:    CHECK FAILED: mutant_winning_turn_replaced.txt: loser node: tree has 0 replies, the site engine allows 3 at 122100010 debts 0/0
+ok   wrong_winner
+      game.py: CHECK FAILED: loser node: tree has 1 replies, game.py allows 9 at ......... debts 0/0
+      site:    CHECK FAILED: mutant_wrong_winner.txt: loser node: tree has 1 replies, the site engine allows 9 at 000000000 debts 0/0
+ok   other_prices
+      game.py: CHECK FAILED: loser node: tree has 11 replies, game.py allows 3 at OXOOXO... debts 0/8
+      site:    CHECK FAILED: mutant_other_prices.txt: loser node: tree has 11 replies, the site engine allows 3 at 212212000 debts 0/8
+ok   draw rule
+      limit 5: CHECK FAILED: results/opening_4.txt: line ends in a draw (no-captures) for the claimed winner after -/2/-
+      no draw: VERIFIED (site engine, no draw rule): black wins 3x3 Nexus (p1=2, p2=4) after [-/4/-]: results/opening_4.txt
+ALL MUTANTS REJECTED
